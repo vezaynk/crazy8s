@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="styles/card.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #ccc;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: space-between;
+            min-height: 100vh;
+        }
+
+        .hand {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            justify-content: space-between;
+        }
+
+        .hand .card {
+            flex: 0 0 auto;
+        }
+
+        .deck {
+            height: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+            flex: 1;
+        }
+
+        .toolbar {
+            position: fixed;
+            z-index: 999;
+            background-color: rgba(0, 0, 0, 0.719);
+            color: #fff;
+            width: 100%;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .toolbar h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .hand-bot {
+            height: 100px;
+            overflow: hidden;
+            transform: rotateZ(180deg);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="toolbar">
+        <h1>Casino Name</h1>
+        <span>Your turn |</span>
+        <span>Money: 999$ |</span>
+        <span>Tap deck to end turn</span>
+    </div>
+    <div class="container">
+        <section class="hand hand-bot">
+            <div class="card back-side black">
+                <div class="card--back">
+                    <section>
+                    </section>
+                    <div class="overlay">
+                        <div class="quadrant">
+                            <span>&hearts;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&spades;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&clubs;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&diams;</span>
+                        </div>
+                    </div>
+                    <section>
+                    </section>
+                </div>
+                <div class="card--front">
+                    <header>
+                        <span class="number">K</span>
+                        <span class="text">King of spades</span class="text">
+                    </header>
+                    <section>
+                        <span>K</span>
+                    </section>
+                    <header>
+                        <span class="number">K</span>
+                        <span class="text">King of spades</span class="text">
+                    </header>
+                </div>
+            </div>
+            <div class="card back-side black">
+                <div class="card--back">
+                    <section>
+                    </section>
+                    <div class="overlay">
+                        <div class="quadrant">
+                            <span>&hearts;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&spades;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&clubs;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&diams;</span>
+                        </div>
+                    </div>
+                    <section>
+                    </section>
+                </div>
+                <div class="card--front">
+                    <header>
+                        <span class="number">4</span>
+                        <span class="text">four of clubs</span class="text">
+                    </header>
+                    <section>
+                        <span>&clubs;</span>
+                        <span>&clubs;</span>
+                        <span>&clubs;</span>
+                        <span>&clubs;</span>
+                    </section>
+                    <header>
+                        <span class="number">4</span>
+                        <span class="text">four of clubs</span class="text">
+                    </header>
+                </div>
+            </div>
+            <div class="card back-side red">
+                <div class="card--back">
+                    <section>
+                    </section>
+                    <div class="overlay">
+                        <div class="quadrant">
+                            <span>&hearts;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&spades;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&clubs;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&diams;</span>
+                        </div>
+                    </div>
+                    <section>
+                    </section>
+                </div>
+                <div class="card--front">
+                    <header>
+                        <span class="number">A</span>
+                        <span class="text">Ace of hearts</span class="text">
+                    </header>
+                    <section>
+                        <span>&hearts;</span>
+                    </section>
+                    <header>
+                        <span class="number">A</span>
+                        <span class="text">Ace of hearts</span class="text">
+                    </header>
+                </div>
+            </div>
+            <div class="card back-side red">
+                <div class="card--back">
+                    <section>
+                    </section>
+                    <div class="overlay">
+                        <div class="quadrant">
+                            <span>&hearts;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&spades;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&clubs;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&diams;</span>
+                        </div>
+                    </div>
+                    <section>
+                    </section>
+                </div>
+                <div class="card--front">
+                    <header>
+                        <span class="number">A</span>
+                        <span class="text">Ace of hearts</span class="text">
+                    </header>
+                    <section>
+                        <span>&hearts;</span>
+                    </section>
+                    <header>
+                        <span class="number">A</span>
+                        <span class="text">Ace of hearts</span class="text">
+                    </header>
+                </div>
+            </div>
+            <div class="card back-side red">
+                <div class="card--back">
+                    <section>
+                    </section>
+                    <div class="overlay">
+                        <div class="quadrant">
+                            <span>&hearts;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&spades;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&clubs;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&diams;</span>
+                        </div>
+                    </div>
+                    <section>
+                    </section>
+                </div>
+                <div class="card--front">
+                    <header>
+                        <span class="number">A</span>
+                        <span class="text">Ace of hearts</span class="text">
+                    </header>
+                    <section>
+                        <span>&hearts;</span>
+                    </section>
+                    <header>
+                        <span class="number">A</span>
+                        <span class="text">Ace of hearts</span class="text">
+                    </header>
+                </div>
+            </div>
+            <div class="card back-side red">
+                <div class="card--back">
+                    <section>
+                    </section>
+                    <div class="overlay">
+                        <div class="quadrant">
+                            <span>&hearts;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&spades;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&clubs;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&diams;</span>
+                        </div>
+                    </div>
+                    <section>
+                    </section>
+                </div>
+                <div class="card--front">
+                    <header>
+                        <span class="number">A</span>
+                        <span class="text">Ace of hearts</span class="text">
+                    </header>
+                    <section>
+                        <span>&hearts;</span>
+                    </section>
+                    <header>
+                        <span class="number">A</span>
+                        <span class="text">Ace of hearts</span class="text">
+                    </header>
+                </div>
+            </div>
+            <div class="card back-side red">
+                <div class="card--back">
+                    <section>
+                    </section>
+                    <div class="overlay">
+                        <div class="quadrant">
+                            <span>&hearts;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&spades;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&clubs;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&diams;</span>
+                        </div>
+                    </div>
+                    <section>
+                    </section>
+                </div>
+                <div class="card--front">
+                    <header>
+                        <span class="number">A</span>
+                        <span class="text">Ace of hearts</span class="text">
+                    </header>
+                    <section>
+                        <span>&hearts;</span>
+                    </section>
+                    <header>
+                        <span class="number">A</span>
+                        <span class="text">Ace of hearts</span class="text">
+                    </header>
+                </div>
+            </div>
+            <div class="card back-side red">
+                <div class="card--back">
+                    <section>
+                    </section>
+                    <div class="overlay">
+                        <div class="quadrant">
+                            <span>&hearts;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&spades;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&clubs;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&diams;</span>
+                        </div>
+                    </div>
+                    <section>
+                    </section>
+                </div>
+                <div class="card--front">
+                    <header>
+                        <span class="number">A</span>
+                        <span class="text">Ace of hearts</span class="text">
+                    </header>
+                    <section>
+                        <span>&hearts;</span>
+                    </section>
+                    <header>
+                        <span class="number">A</span>
+                        <span class="text">Ace of hearts</span class="text">
+                    </header>
+                </div>
+            </div>
+
+        </section>
+        <section class="deck">
+            <div class="card back-side black">
+                <div class="card--back">
+                    <section>
+                    </section>
+                    <div class="overlay">
+                        <div class="quadrant">
+                            <span>&hearts;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&spades;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&clubs;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&diams;</span>
+                        </div>
+                    </div>
+                    <section>
+                    </section>
+                </div>
+                <div class="card--front">
+                    <header>
+                        <span class="number">K</span>
+                        <span class="text">King of spades</span class="text">
+                    </header>
+                    <section>
+                        <span>K</span>
+                    </section>
+                    <header>
+                        <span class="number">K</span>
+                        <span class="text">King of spades</span class="text">
+                    </header>
+                </div>
+            </div>
+            <div class="card front-side black">
+                <div class="card--back">
+                    <section>
+                    </section>
+                    <div class="overlay">
+                        <div class="quadrant">
+                            <span>&hearts;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&spades;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&clubs;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&diams;</span>
+                        </div>
+                    </div>
+                    <section>
+                    </section>
+                </div>
+                <div class="card--front">
+                    <header>
+                        <span class="number">K</span>
+                        <span class="text">King of spades</span class="text">
+                    </header>
+                    <section>
+                        <span>K</span>
+                    </section>
+                    <header>
+                        <span class="number">K</span>
+                        <span class="text">King of spades</span class="text">
+                    </header>
+                </div>
+            </div>
+        </section>
+        <section class="hand hand-player">
+            <div class="card front-side black">
+                <div class="card--back">
+                    <section>
+                    </section>
+                    <div class="overlay">
+                        <div class="quadrant">
+                            <span>&hearts;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&spades;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&clubs;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&diams;</span>
+                        </div>
+                    </div>
+                    <section>
+                    </section>
+                </div>
+                <div class="card--front">
+                    <header>
+                        <span class="number">K</span>
+                        <span class="text">King of spades</span class="text">
+                    </header>
+                    <section>
+                        <span>K</span>
+                    </section>
+                    <header>
+                        <span class="number">K</span>
+                        <span class="text">King of spades</span class="text">
+                    </header>
+                </div>
+            </div>
+            <div class="card front-side black">
+                <div class="card--back">
+                    <section>
+                    </section>
+                    <div class="overlay">
+                        <div class="quadrant">
+                            <span>&hearts;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&spades;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&clubs;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&diams;</span>
+                        </div>
+                    </div>
+                    <section>
+                    </section>
+                </div>
+                <div class="card--front">
+                    <header>
+                        <span class="number">4</span>
+                        <span class="text">four of clubs</span class="text">
+                    </header>
+                    <section>
+                        <span>&clubs;</span>
+                        <span>&clubs;</span>
+                        <span>&clubs;</span>
+                        <span>&clubs;</span>
+                    </section>
+                    <header>
+                        <span class="number">4</span>
+                        <span class="text">four of clubs</span class="text">
+                    </header>
+                </div>
+            </div>
+            <div class="card front-side red">
+                <div class="card--back">
+                    <section>
+                    </section>
+                    <div class="overlay">
+                        <div class="quadrant">
+                            <span>&hearts;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&spades;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&clubs;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&diams;</span>
+                        </div>
+                    </div>
+                    <section>
+                    </section>
+                </div>
+                <div class="card--front">
+                    <header>
+                        <span class="number">A</span>
+                        <span class="text">Ace of hearts</span class="text">
+                    </header>
+                    <section>
+                        <span>&hearts;</span>
+                    </section>
+                    <header>
+                        <span class="number">A</span>
+                        <span class="text">Ace of hearts</span class="text">
+                    </header>
+                </div>
+            </div>
+            <div class="card front-side red">
+                <div class="card--back">
+                    <section>
+                    </section>
+                    <div class="overlay">
+                        <div class="quadrant">
+                            <span>&hearts;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&spades;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&clubs;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&diams;</span>
+                        </div>
+                    </div>
+                    <section>
+                    </section>
+                </div>
+                <div class="card--front">
+                    <header>
+                        <span class="number">A</span>
+                        <span class="text">Ace of hearts</span class="text">
+                    </header>
+                    <section>
+                        <span>&hearts;</span>
+                    </section>
+                    <header>
+                        <span class="number">A</span>
+                        <span class="text">Ace of hearts</span class="text">
+                    </header>
+                </div>
+            </div>
+            <div class="card front-side red">
+                <div class="card--back">
+                    <section>
+                    </section>
+                    <div class="overlay">
+                        <div class="quadrant">
+                            <span>&hearts;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&spades;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&clubs;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&diams;</span>
+                        </div>
+                    </div>
+                    <section>
+                    </section>
+                </div>
+                <div class="card--front">
+                    <header>
+                        <span class="number">A</span>
+                        <span class="text">Ace of hearts</span class="text">
+                    </header>
+                    <section>
+                        <span>&hearts;</span>
+                    </section>
+                    <header>
+                        <span class="number">A</span>
+                        <span class="text">Ace of hearts</span class="text">
+                    </header>
+                </div>
+            </div>
+            <div class="card front-side red">
+                <div class="card--back">
+                    <section>
+                    </section>
+                    <div class="overlay">
+                        <div class="quadrant">
+                            <span>&hearts;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&spades;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&clubs;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&diams;</span>
+                        </div>
+                    </div>
+                    <section>
+                    </section>
+                </div>
+                <div class="card--front">
+                    <header>
+                        <span class="number">A</span>
+                        <span class="text">Ace of hearts</span class="text">
+                    </header>
+                    <section>
+                        <span>&hearts;</span>
+                    </section>
+                    <header>
+                        <span class="number">A</span>
+                        <span class="text">Ace of hearts</span class="text">
+                    </header>
+                </div>
+            </div>
+            <div class="card front-side red">
+                <div class="card--back">
+                    <section>
+                    </section>
+                    <div class="overlay">
+                        <div class="quadrant">
+                            <span>&hearts;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&spades;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&clubs;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&diams;</span>
+                        </div>
+                    </div>
+                    <section>
+                    </section>
+                </div>
+                <div class="card--front">
+                    <header>
+                        <span class="number">A</span>
+                        <span class="text">Ace of hearts</span class="text">
+                    </header>
+                    <section>
+                        <span>&hearts;</span>
+                    </section>
+                    <header>
+                        <span class="number">A</span>
+                        <span class="text">Ace of hearts</span class="text">
+                    </header>
+                </div>
+            </div>
+            <div class="card front-side red">
+                <div class="card--back">
+                    <section>
+                    </section>
+                    <div class="overlay">
+                        <div class="quadrant">
+                            <span>&hearts;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&spades;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&clubs;</span>
+                        </div>
+                        <div class="quadrant">
+                            <span>&diams;</span>
+                        </div>
+                    </div>
+                    <section>
+                    </section>
+                </div>
+                <div class="card--front">
+                    <header>
+                        <span class="number">A</span>
+                        <span class="text">Ace of hearts</span class="text">
+                    </header>
+                    <section>
+                        <span>&hearts;</span>
+                    </section>
+                    <header>
+                        <span class="number">A</span>
+                        <span class="text">Ace of hearts</span class="text">
+                    </header>
+                </div>
+            </div>
+
+        </section>
+    </div>
+    <script>
+        /*document.querySelector(".card").addEventListener("mouseenter", function () {
+                    this.classList.add("back-side")
+                    this.classList.remove("front-side")
+                })
+
+                document.querySelector(".card").addEventListener("mouseleave", function () {
+                    this.classList.remove("back-side")
+                    this.classList.add("front-side")
+                })*/
+    </script>
+</body>
+
+</html>
