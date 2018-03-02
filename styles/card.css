@@ -145,8 +145,7 @@
 
 .card--front header:nth-of-type(2) {
     transform: rotateZ(180deg);
-    background-color: var(--primary-color);
-    ;
+    background-color: var(--secondary-color);
 }
 
 .card--front header .number {
