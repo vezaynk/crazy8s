@@ -43,10 +43,10 @@ class Deck {
 
     /**
      * Removes last card of the deck and returns it
-     * @returns Last card of deck or false if deck is empty
+     * @returns Last card of deck
      */
-    drawCard(): Card | false {
-        return this.cards.length ? this.cards.pop() : false;
+    drawCard(): Card {
+        return this.cards.pop()
     }
 
     /**
@@ -90,78 +90,95 @@ class Deck {
             }
         }
     }
-
 }
 
-// Tests
-console.log("Instantiate new deck");
-let deck = new Deck();
-
-console.log("Checking if deck is correctly populated");
-console.assert(deck.cards.length == 52, `There are ${deck.cards.length} deck.cards instead of 52`, deck.cards, deck)
-
-console.log("Checking individual suits");
-let testSuits = [{ letter: "C", name: "Clubs" }, { letter: "S", name: "Spades" }, { letter: "D", name: "Diamonds" }, { letter: "H", name: "Hearts" }]
-let cardsPerSuit = 13;
-testSuits.forEach(test => {
-    console.log(`Testing for ${cardsPerSuit} ${test.name}`);
-    let cards = deck.cards.filter(c => {
-        return c.suit == test.letter;
-    })
-    console.assert(cards.length == cardsPerSuit, `There are ${cards.length} ${test.name} instead of ${cardsPerSuit}`, cards, deck)
-})
-
-
-testSuits.forEach(test => {
-    console.log(`Testing for 13 unique cards in ${test.name}`);
-    let cards = deck.cards.sort((a, b) => a.value - b.value).filter(c => {
-        return c.suit == test.letter;
-    })
-    let seqCards = cards.filter((card, index) => {
-        return card.value == index + 1;
-    })
-
-    console.assert(seqCards.length == cardsPerSuit, `Sequence-breaking card value for ${cardsPerSuit}`, cards, deck)
-})
-
-console.log("Shuffling deck")
-deck.shuffleDeck()
-console.log("Once", deck.cards.map(c => c.suit + c.value).join(" "))
-deck.shuffleDeck()
-console.log("Twice", deck.cards.map(c => c.suit + c.value).join(" "))
-deck.shuffleDeck()
-console.log("Thrice", deck.cards.map(c => c.suit + c.value).join(" "))
-
-console.log("Shuffling 300 times and checking for duplicate outputs. Tolerating a maximum of 2 matches.")
-let matches = 0;
-let shuffleResults = [];
-Array(300).fill(0).forEach(_ => {
-    deck.shuffleDeck()
-    let text = deck.cards.map(c => c.suit + c.value).join(" ")
-    if (shuffleResults.indexOf(text) === -1)
-        shuffleResults.push(text)
-    else
-        matches++;
-})
-
-console.assert(matches <= 2, "Too many matches after shuffling");
-
-console.log("Test playing all cards");
-let playedCards = [];
-
-while (!deck.isEmpty) {
-    playedCards.push(deck.drawCard());
+class Game {
+    deck: Deck = new Deck()
+    discardPile: DiscardPile = new DiscardPile(this)
+    turn: number = -1
+    players: Player[];
+    // This is magical. To avoid having a game which depends on instances of players who depend on an instance of game
+    // The game constructor depends of an array of player constructors. I did not think it was possible, but it seems it is!
+    constructor(playerConstructors: { new(arg: Game): Player }[]) {
+        this.players = playerConstructors.map(playerConstructor => new playerConstructor(this));
+        this.nextTurn();
+    }
+    nextTurn() {
+        this.turn = (this.turn + 1) % this.players.length;
+        let currentPlayer = this.players[this.turn]
+        currentPlayer.playTurn();
+    }
 }
 
-console.log("Testing if all cards were played.");
-testSuits.forEach(test => {
-    console.log(`Testing for 13 unique cards in ${test.name}`);
-    let cards = playedCards.sort((a, b) => a.value - b.value).filter(c => {
-        return c.suit == test.letter;
-    })
-    let seqCards = cards.filter((card, index) => {
-        return card.value == index + 1;
-    })
+class DiscardPile {
+    cards: Card[];
 
-    console.assert(seqCards.length == cardsPerSuit, `Sequence-breaking card value for ${cardsPerSuit}`, cards, deck)
-})
+    constructor(game: Game) {
+        this.cards.push(game.deck.drawCard())
+    }
+
+    getLastCard(): Card {
+        return this.cards[this.cards.length - 1];
+    }
+
+    canPlayCard(card: Card): boolean {
+        return this.getLastCard().value == card.value
+            || this.getLastCard().suit == card.suit
+    }
+
+    putCard(card: Card) {
+        this.cards.push(card);
+    }
+}
+
+class Hand {
+    cards: Card[] = [];
+    deck: Deck;
+    addCard(card: Card) {
+        this.cards.push(card)
+    }
+    dropCard(cardIndex: number) {
+        this.cards.splice(cardIndex, 1);
+    }
+}
+
+class Player {
+    hand: Hand;
+    game: Game;
+    constructor(game: Game) {
+        this.hand = new Hand();
+        this.game = game;
+        // Populate hand with 8 cards
+        for (let i = 0; i < 8 && !game.deck.isEmpty; i++) {
+            this.hand.addCard(game.deck.drawCard());
+        }
+    }
+
+    playTurn() {
+
+    }
+}
+
+class BotPlayer extends Player {
+    playTurn() {
+        let playedCard = this.hand.cards.find((card, index) => {
+            if (this.game.discardPile.canPlayCard(card)) {
+                this.hand.dropCard(index);
+                this.game.discardPile.putCard(card);
+                console.log("Bot is Playing", card);
+                return true;
+            }
+            return false;
+        });
+
+        if (!playedCard) {
+            this.hand.addCard(this.game.deck.drawCard());
+            console.log("Bot could not play any ")
+        }
+
+        console.log("Bot turn is finished, ending turn")
+        this.game.nextTurn();
+    }
+}
+
+let game = new Game([BotPlayer])

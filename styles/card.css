@@ -23,8 +23,8 @@
     position: absolute;
     height: calc(100% - 20px);
     width: calc(100% - 20px);
-    top: 10;
-    left: 10;
+    top: 10px;
+    left: 10px;
     backface-visibility: hidden;
     transition: 0.6s;
     border: solid 5px white;
