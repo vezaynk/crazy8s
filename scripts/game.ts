@@ -39,6 +39,8 @@ class Deck {
 
             return newCard;
         })
+
+        console.log(this.cards)
     }
 
     /**
@@ -46,7 +48,8 @@ class Deck {
      * @returns Last card of deck
      */
     drawCard(): Card {
-        return this.cards.pop()
+        let drawnCard = this.cards.pop();
+        return drawnCard;
     }
 
     /**
@@ -82,8 +85,8 @@ class Deck {
      */
     shuffleDeck(n: number = 1) {
         for (let shuffles = 0; shuffles <= n; shuffles++) {
-            for (let i = this.cards.length - 1; i >= 0; i--) {
-                let randomIndex = Math.floor((Math.random() * 520)) % 52;
+            for (let i = this.cards.length - 1; i > 0; i--) {
+                let randomIndex = Math.floor(Math.random() * (i+1));
                 let tmpCard: Card = this.cards[i];
                 this.cards[i] = this.cards[randomIndex];
                 this.cards[randomIndex] = tmpCard;
@@ -100,7 +103,15 @@ class Game {
     // This is magical. To avoid having a game which depends on instances of players who depend on an instance of game
     // The game constructor depends of an array of player constructors. I did not think it was possible, but it seems it is!
     constructor(playerConstructors: { new(arg: Game): Player }[]) {
+        this.deck.shuffleDeck(12)
+        console.log(this.deck.cards)
         this.players = playerConstructors.map(playerConstructor => new playerConstructor(this));
+
+        // Temporary, give the players names
+        this.players.forEach((player, index) => {
+            player.name = `Player ${index}`
+        })
+
         this.nextTurn();
     }
     nextTurn() {
@@ -108,10 +119,24 @@ class Game {
         let currentPlayer = this.players[this.turn]
         currentPlayer.playTurn();
     }
+    rebuildDeck() {
+        // set deck to all cards except last one
+        this.deck.cards = this.discardPile.cards.filter((c, index, cards)=>{
+            return (index+1 != cards.length)
+        })
+
+        // Reshuffling cards
+        this.deck.shuffleDeck();
+
+        // Set discard pile cards to the last one
+        this.discardPile.cards = [this.discardPile.getLastCard()]
+
+        // Good to go!
+    }
 }
 
 class DiscardPile {
-    cards: Card[];
+    cards: Card[] = [];
 
     constructor(game: Game) {
         this.cards.push(game.deck.drawCard())
@@ -145,6 +170,7 @@ class Hand {
 class Player {
     hand: Hand;
     game: Game;
+    name: string = "unknown"
     constructor(game: Game) {
         this.hand = new Hand();
         this.game = game;
@@ -163,22 +189,38 @@ class BotPlayer extends Player {
     playTurn() {
         let playedCard = this.hand.cards.find((card, index) => {
             if (this.game.discardPile.canPlayCard(card)) {
+                if (card.value == 8) {
+                    card.suit = "H";
+                }
                 this.hand.dropCard(index);
                 this.game.discardPile.putCard(card);
-                console.log("Bot is Playing", card);
+                console.log(`${this.name} is Playing`, card);
                 return true;
             }
             return false;
         });
 
         if (!playedCard) {
+            if (!this.game.deck.isEmpty) {
+                console.log(`${this.name} could not play any card. Drawing.`)
+            } else {
+                console.log("Deck is empty! Using discard pile.")
+                this.game.rebuildDeck();
+            }
             this.hand.addCard(this.game.deck.drawCard());
-            console.log("Bot could not play any ")
         }
 
-        console.log("Bot turn is finished, ending turn")
-        this.game.nextTurn();
+        console.log(`${this.name} turn is finished, ending turn`)
+
+        if (this.hand.cards.length) {
+            console.log(`${this.name} has ${this.hand.cards.length} cards remaining`)
+            this.game.nextTurn();
+        } else {
+            // Game over. Victory.
+            console.log(`${this.name} ran out of cards. Victory!`);
+        }
+
     }
 }
 
-let game = new Game([BotPlayer])
+let game = new Game([BotPlayer, BotPlayer, BotPlayer])
