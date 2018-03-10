@@ -1,4 +1,6 @@
 // Tests
+import { Deck, Game, Player, BotPlayer } from "./game";
+
 console.log("Testing the deck");
 let deck = new Deck();
 
@@ -70,3 +72,7 @@ testSuits.forEach(test => {
 
     console.assert(seqCards.length == cardsPerSuit, `Sequence-breaking card value for ${cardsPerSuit}`, cards, deck)
 })
+
+
+let game = new Game([BotPlayer, BotPlayer, BotPlayer]);
+game.nextTurn();
