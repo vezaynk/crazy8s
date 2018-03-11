@@ -1,5 +1,4 @@
 // Tests
-import { Deck, Game, Player, BotPlayer } from "./game";
 
 console.log("Testing the deck");
 let deck = new Deck();
@@ -74,5 +73,11 @@ testSuits.forEach(test => {
 })
 
 
-let game = new Game([BotPlayer, BotPlayer, BotPlayer]);
-game.nextTurn();
+console.log("Executing game with 2 bot players")
+
+let human = new User("Slava", "slava", "1234", "1234", 999);
+let bet = new Bet(30, human, ()=>{
+    console.log(human.name, "now has", human.moneyRemaning)
+}, false);
+
+bet.run();

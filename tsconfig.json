@@ -1,8 +1,12 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "outFile": "./dist/build.js",
-    "rootDir": "./src/",
-    "module": "commonjs"
+    "removeComments": false,
+    "preserveConstEnums": true,
+    "outFile": "./scripts/build.js",
+    "sourceRoot": "./scripts/",
+    "rootDir": "./scripts/",
+    "module": "system",
+    "sourceMap": true
   }
 }
