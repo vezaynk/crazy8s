@@ -498,7 +498,7 @@ function renderInfoBox(user) {
 }
 function renderDeck(topCard) {
     let el = document.createElement("section");
-    el.className = "deck";
+    el.classList.add("deck");
     el.appendChild(renderCard(topCard, false));
     el.appendChild(renderCard(topCard, true));
     return el;
@@ -520,6 +520,7 @@ function renderView(root, casino) {
     root.appendChild(renderHeader(casino));
     // Render everything else
     let handPlayer = renderTable(casino);
+    handPlayer.children.item(0).id = "hand-bot";
     handPlayer.children.item(2).id = "hand-player";
     root.appendChild(handPlayer);
 }

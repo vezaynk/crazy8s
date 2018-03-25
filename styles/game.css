@@ -38,6 +38,10 @@ body {
     flex: 1;
 }
 
+.deck .card:first-child {
+    transform: rotate(90deg);
+}
+
 .toolbar {
     position: fixed;
     z-index: 999;
@@ -285,3 +289,8 @@ a {
 .hidden {
     display: none;
 }
+
+#hand-bot {
+    transform: rotate(180deg);
+}
+
