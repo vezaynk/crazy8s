@@ -141,7 +141,7 @@ function renderHeader(casino: Casino) {
         <h1>The Happy Gambler</h1>
         <p>
             <span>
-                <a id="showInfoBox" href="#">${casino.user.name}</a>'s turn |</span>
+                <a id="showInfoBox" href="#">${casino.game.players[casino.game.turn].name}</a>'s turn |</span>
             <span>Bet: ${casino.betAmount}$ |</span>
             <span>Pick a card</span>
         </p>
@@ -154,6 +154,10 @@ function renderHeader(casino: Casino) {
 
 
     elShowInfoBox.addEventListener("click", function () {
+        elInfoBox.classList.toggle("hidden")
+    })
+
+    elInfoBox.addEventListener("click", function () {
         elInfoBox.classList.toggle("hidden")
     })
 

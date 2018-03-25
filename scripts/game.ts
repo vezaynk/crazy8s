@@ -96,7 +96,7 @@ class Deck {
 class Game {
     deck: Deck = new Deck()
     discardPile: DiscardPile;
-    turn: number = -1
+    turn: number = 1;
     players: Player[] = [];
 
     constructor() {
@@ -108,7 +108,6 @@ class Game {
             console.log(`Game is terminated.`)
             return;
         }
-        this.turn = (this.turn + 1) % this.players.length;
         let currentPlayer = this.players[this.turn]
         return currentPlayer.playTurn();
     }
@@ -234,9 +233,24 @@ class Player {
             console.log("Human was suppose to play")
             let cardIndex = await this.getCardIndexToPlay();
             let card = this.hand.cards[cardIndex];
-            console.log(card)
+
+            if (!card) {
+                if (!this.game.deck.isEmpty) {
+                    console.log(`${this.name} Decided to draw a card.`)
+                } else {
+                    console.log("Deck is empty! Rebuilding using discard pile.")
+                    this.game.rebuildDeck();
+                }
+
+                // Pick a new card
+                let newCard = this.game.deck.drawCard();
+                this.hand.addCard(newCard);
+                console.log("Drew", newCard);
+            } else {
+
+            }
+
             resolve();
-            // TODO: Allow human player to play (Interaction with DOM required)
         });
     }
 
@@ -254,6 +268,8 @@ class Player {
             else {
                 await this.runTurn();
             }
+
+            this.game.turn = (this.game.turn + 1) % this.game.players.length;
             resolve();
         })
 
@@ -261,8 +277,6 @@ class Player {
 }
 
 class BotPlayer extends Player {
-    isBot = true
-
     getCardIndexToPlay(): Promise<number> {
         return new Promise(resolve => {
             let index = this.hand.cards.findIndex((card, index) => this.game.discardPile.canPlayCard(card));
@@ -365,6 +379,7 @@ class Casino {
                 console.log("Betting more than has money. Kill.")
                 return reject();
             }
+
 
             this.renderHook();
             while (!this.game.isOver()) {
