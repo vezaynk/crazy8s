@@ -75,9 +75,26 @@ testSuits.forEach(test => {
 
 console.log("Executing game with 2 bot players")
 
-let human = new User("Slava", "slava", "1234", "1234", 999);
+/*let human = new User("Slava", "slava", "1234", "1234", 999);
 let bet = new Bet(30, human, ()=>{
     console.log(human.name, "now has", human.moneyRemaning)
 }, false);
 
-bet.run();
+bet.run();*/
+
+let game = new Game();
+let humanPlayer = new Player(game);
+humanPlayer.name = "Human";
+let botPlayer = new BotPlayer(game);
+botPlayer.name = "Bot";
+
+game.players.push(humanPlayer, botPlayer);
+
+async function runGame() {
+    while (!game.isOver()) {
+        await game.nextTurn();
+    }
+}
+
+runGame();
+

@@ -97,38 +97,22 @@ class Game {
     deck: Deck = new Deck()
     discardPile: DiscardPile = new DiscardPile(this)
     turn: number = -1
-    players: Player[];
-    isOver: boolean = false;
+    players: Player[] = [];
 
-    onGameEnd: (won: boolean) => void = () => 1;
-
-    // This is magical. To avoid having a game which depends on instances of players who depend on an instance of game
-    // The game constructor depends of an array of player constructors. I did not think it was possible, but it seems it is!
-    constructor(playerConstructors: { new(arg: Game): Player }[], gameEnd: (playerWon: boolean) => void) {
+    constructor() {
         this.deck.shuffleDeck(12)
-        this.onGameEnd = gameEnd;
-        this.players = playerConstructors.map(playerConstructor => new playerConstructor(this));
-
-        // Temporary, give the players names
-        this.players.forEach((player, index) => {
-            player.name = `Player ${index}`
-        })
     }
     nextTurn() {
-        if (this.isOver) {
+        if (this.isOver()) {
             console.log(`Game is terminated.`)
             return;
         }
         this.turn = (this.turn + 1) % this.players.length;
         let currentPlayer = this.players[this.turn]
-        let $this = this;
-        currentPlayer.playTurn(function () {
-            $this.gameStatusCheck();
-            $this.nextTurn();
-        });
+        return currentPlayer.playTurn();
     }
-    gameStatusCheck() {
-        let winningPlayer = this.players.find((player) => {
+    isOver() {
+        let winningPlayer = this.players.find(player => {
             if (player.hand.cards.length == 0) {
                 return true;
             }
@@ -136,15 +120,14 @@ class Game {
         })
 
         if (winningPlayer) {
-            this.isOver = true;
             console.log(`${winningPlayer.name} has emptied his hand. Victory!`)
-            this.onGameEnd(this.turn == 0);
-            return;
+            return true;
         }
 
         if (this.deck.isEmpty) {
             this.rebuildDeck();
         }
+        return false;
     }
 
     rebuildDeck() {
@@ -233,121 +216,129 @@ class Player {
      * Executes whatever is necessary to run the turn
      * @param done Callback for when turn is finished
      */
-    runTurn(done: () => void) {
-        // TODO: Allow human player to play (Interaction with DOM required)
-        // Deferred for subsequent assignment
+    runTurn(): Promise<any> {
+        return new Promise((resolve) => {
+            console.log("Human was suppose to play")
+            resolve();
+            // TODO: Allow human player to play (Interaction with DOM required)
+        });
     }
 
     /**
      * Runs checks before running turn and calls runTurn()
      * @param done Callback for when turn is finished
      */
-    playTurn(done: () => void) {
-        if (this.skipTurn) {
-            console.log(`${this.name}'s turn is skipped.`)
-            this.skipTurn = false;
-            return done();
-        }
+    playTurn(): Promise<any> {
+        return new Promise(async (resolve) => {
+            if (this.skipTurn) {
+                // Skip players turn.
+                console.log(`${this.name}'s turn is skipped.`)
+                this.skipTurn = false;
+            }
+            else {
+                await this.runTurn();
+            }
+            resolve();
+        })
 
-        this.runTurn(done);
     }
 }
 
 class BotPlayer extends Player {
     isBot = true
 
-    runTurn(done: () => void) {
-        console.log(`It is ${this.name}'s turn! He has ${this.hand.cards.length} cards remaining.`, [].concat(this.hand.cards))
+    runTurn(): Promise<any> {
+        return new Promise(resolve => {
+            console.log(`It is ${this.name}'s turn! He has ${this.hand.cards.length} cards remaining.`, [].concat(this.hand.cards))
 
-        // Artificial delay before playing
-        setTimeout(_ => {
+            // Artificial delay before playing
+            setTimeout(_ => {
 
-            // Look for a playable card and play it if possible
-            let playedCard = this.hand.cards.find((card, index) => {
-                if (this.game.discardPile.canPlayCard(card)) {
+                // Look for a playable card and play it if possible
+                let playedCard = this.hand.cards.find((card, index) => {
+                    if (this.game.discardPile.canPlayCard(card)) {
 
-                    // Pick rando suit to change to
+                        // Pick rando suit to change to
 
-                    if (card.value == 8) {
-                        switch (Math.floor(Math.random() * 4)) {
-                            case 0:
-                                card.suit = 'S';
-                                break;
-                            case 1:
-                                card.suit = 'C';
-                                break;
-                            case 2:
-                                card.suit = 'D';
-                                break;
-                            case 3:
-                                card.suit = 'H';
-                                break;
+                        if (card.value == 8) {
+                            switch (Math.floor(Math.random() * 4)) {
+                                case 0:
+                                    card.suit = 'S';
+                                    break;
+                                case 1:
+                                    card.suit = 'C';
+                                    break;
+                                case 2:
+                                    card.suit = 'D';
+                                    break;
+                                case 3:
+                                    card.suit = 'H';
+                                    break;
+                            }
+                            console.log("An 8 was played! Changing suit to", card.suit)
                         }
-                        console.log("An 8 was played! Changing suit to", card.suit)
+
+                        this.hand.dropCard(index);
+                        this.game.discardPile.putCard(card);
+                        console.log(`${this.name} is Playing`, card);
+                        return true;
+                    }
+                    return false;
+                });
+
+                // No playable card was found
+                if (!playedCard) {
+                    if (!this.game.deck.isEmpty) {
+                        console.log(`${this.name} could not play any card. Drawing.`)
+                    } else {
+                        console.log("Deck is empty! Rebuilding using discard pile.")
+                        this.game.rebuildDeck();
                     }
 
-                    this.hand.dropCard(index);
-                    this.game.discardPile.putCard(card);
-                    console.log(`${this.name} is Playing`, card);
-                    return true;
-                }
-                return false;
-            });
-
-            // No playable card was found
-            if (!playedCard) {
-                if (!this.game.deck.isEmpty) {
-                    console.log(`${this.name} could not play any card. Drawing.`)
-                } else {
-                    console.log("Deck is empty! Rebuilding using discard pile.")
-                    this.game.rebuildDeck();
+                    // Pick a new card
+                    let newCard = this.game.deck.drawCard();
+                    this.hand.addCard(newCard);
+                    console.log("Drew", newCard);
                 }
 
-                // Pick a new card
-                let newCard = this.game.deck.drawCard();
-                this.hand.addCard(newCard);
-                console.log("Drew", newCard);
-            }
 
+                console.log(`Turn is finished, ending turn`);
 
-            console.log(`Turn is finished, ending turn`);
+                return resolve();
 
-            return done();
+            }, 300)
+        })
 
-        }, 300)
     }
 }
 
-class Bet {
+class Casino {
     onGameEnded: (moneyRemaningChange: number) => void;
     game: Game;
-    players = [Player, BotPlayer];
-    better: User;
-    betAmount: number;
-    constructor(betAmount: number, better: User, onBetEnd: ()=>void, hasHuman: boolean = true) {
-        
-        if (!hasHuman) {
-            this.players[0] = BotPlayer;
-        }
-        
-        this.game = new Game(this.players, (playerWin) => {
-            if (playerWin) {
-                console.log(`${this.better.name} has won ${this.betAmount}`)
-                this.better.moneyRemaning += this.betAmount;
+    user: User;
+    betAmount: number = 0;
+    constructor(user: User, onBetEnd: () => void, hasHuman: boolean = true) {
 
-            }
-            else {
-                console.log(`${this.better.name} has lost ${this.betAmount}`)
-                this.better.moneyRemaning -= this.betAmount;
-            }
-            onBetEnd();
-        })
-        this.betAmount = betAmount;
-        this.better = better;
+        let game = new Game();
+        let botPlayer = new BotPlayer(game);
+        botPlayer.name = "Bot";
+
+
+        let humanPlayer = hasHuman ? new Player(game) : new BotPlayer(game);
+        humanPlayer.name = "Human";
+        
+        game.players.push(humanPlayer, botPlayer);
+        this.user = user;
     }
 
-    run() {
-        this.game.nextTurn();
+    executeBet() {
+        if (this.betAmount > this.user.moneyRemaning) {
+            this.betAmount = 0;
+            console.log("Betting more than has money. Kill.")
+            return;
+        }
+
+        
     }
 }
 
