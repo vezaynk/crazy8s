@@ -1,5 +1,5 @@
 // Tests
-
+/*
 console.log("Testing the deck");
 let deck = new Deck();
 
@@ -74,16 +74,8 @@ testSuits.forEach(test => {
 
 
 console.log("Executing game with 2 bot players")
-
-/*let human = new User("Slava", "slava", "1234", "1234", 999);
-let bet = new Bet(30, human, ()=>{
-    console.log(human.name, "now has", human.moneyRemaning)
-}, false);
-
-bet.run();*/
-
 let game = new Game();
-let humanPlayer = new Player(game);
+let humanPlayer = new BotPlayer(game);
 humanPlayer.name = "Human";
 let botPlayer = new BotPlayer(game);
 botPlayer.name = "Bot";
@@ -96,5 +88,20 @@ async function runGame() {
     }
 }
 
-runGame();
+//runGame();
 
+console.log("Executing bet with 2 bot players")
+let monkeyUser = new User("Slava", "slava", "1234", "1234", 999);
+
+let casino = new Casino(monkeyUser, false);
+casino.betAmount = 30;
+
+
+casino.executeBet().then(won=>{
+  if (won) {
+    console.log("The player won and now has $" + monkeyUser.moneyRemaining);
+  } else {
+    console.log("The player lost and now has $" + monkeyUser.moneyRemaining);
+  }
+});
+*/

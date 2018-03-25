@@ -1,9 +1,227 @@
-let elShowInfoBox = document.getElementById("showInfoBox");
-let elInfoBox = document.getElementById("infoBox");
-elShowInfoBox.addEventListener("click", function () {
-    if (elInfoBox.style.display == "none"){
-        elInfoBox.style.display = "block";
-    } else {
-        elInfoBox.style.display == "none"
+function renderCard(card: Card, faceUp: boolean) {
+    // Determine primary color
+    let color: "red" | "black" = "black"
+    if (card.suit == 'H' || card.suit == 'D')
+        color = "red"
+
+    // Determine card text
+    let text = "";
+    let letter = card.value.toString();
+    // Determine corner text and letter
+    switch (card.value) {
+        case 1:
+            text = "One of "
+            letter = "A";
+            break;
+        case 2:
+            text = "Two of "
+            break;
+        case 3:
+            text = "Three of "
+            break;
+        case 4:
+            text = "Four of "
+            break;
+        case 5:
+            text = "Five of "
+            break;
+        case 6:
+            text = "Six of "
+            break;
+        case 7:
+            text = "Seven of "
+            break;
+        case 8:
+            text = "Eight of "
+            break;
+        case 9:
+            text = "Nine of "
+            break;
+        case 10:
+            text = "Jack of "
+            letter = "J";
+            break;
+        case 11:
+            text = "Queen of "
+            letter = "Q";
+            break;
+        case 12:
+            text = "King of "
+            letter = "K";
+            break;
     }
-})
+
+    let entity = "";
+    switch (card.suit) {
+        case 'H':
+            text += "Hearts"
+            entity = "&hearts;"
+            break;
+
+        case 'C':
+            text += "clubs"
+            entity = "&clubs;"
+            break;
+
+        case 'D':
+            text += "Diamonds"
+            entity = "&diams;"
+            break;
+
+        case 'S':
+            text += "Spades"
+            entity = "&spades;"
+            break;
+
+    }
+
+    let el = document.createElement('div');
+    el.className = `card ${faceUp ? 'front-side' : 'back-side'} ${color}`
+    let html = (`
+    <div class="card--back">
+        <section>
+        </section>
+        <div class="overlay">
+            <div class="quadrant">
+                <span>&hearts;</span>
+            </div>
+            <div class="quadrant">
+                <span>&spades;</span>
+            </div>
+            <div class="quadrant">
+                <span>&clubs;</span>
+            </div>
+            <div class="quadrant">
+                <span>&diams;</span>
+            </div>
+        </div>
+        <section>
+        </section>
+    </div>
+    <div class="card--front">
+        <header>
+            <span class="number">${letter}</span>
+            <span class="text">${text}</span class="text">
+        </header>
+        <section>
+            ${Array(card.value).fill('<span>' + entity + '</span>').join("")}
+        </section>
+        <header>
+            <span class="number">${letter}</span>
+            <span class="text">${text}</span class="text">
+        </header>
+    </div>
+    `)
+    el.innerHTML = html;
+
+    return el;
+}
+
+function renderHand(hand: Hand, faceUp: boolean) {
+    let elHand = document.createElement('section');
+    elHand.className = "hand";
+    hand.cards.forEach(card => elHand.appendChild(renderCard(card, faceUp)));
+
+    return elHand;
+}
+
+function renderHeader(casino: Casino) {
+    let elInfo = document.createElement("div");
+
+    let elTopBar = document.createElement("div")
+    elTopBar.className = "userInfo"
+    elTopBar.innerHTML = `<div class="userInfo">
+    <div class="toolbar">
+        <h1>The Happy Gambler</h1>
+        <p>
+            <span>
+                <a id="showInfoBox" href="#">${casino.user.name}</a>'s turn |</span>
+            <span>Bet: ${casino.betAmount}$ |</span>
+            <span>Pick a card</span>
+        </p>
+    </div>
+</div>`;
+
+    let elShowInfoBox = elTopBar.querySelector("#showInfoBox");
+
+    let elInfoBox = renderInfoBox(casino.user);
+
+
+    elShowInfoBox.addEventListener("click", function () {
+        elInfoBox.classList.toggle("hidden")
+    })
+
+    elInfo.appendChild(elTopBar);
+    elInfo.appendChild(elInfoBox)
+
+    return elInfo;
+}
+
+function renderInfoBox(user: User) {
+    let el = document.createElement("div");
+    el.id = "infoBox";
+    el.innerHTML = `
+    <table>
+        <tr>
+            <th>Name</th>
+            <td>${user.name}</td>
+        </tr>
+        <tr>
+            <th>Username</th>
+            <td>${user.username}</td>
+        </tr>
+        <tr>
+            <th>Phone number</th>
+            <td>${user.phoneNumber}</td>
+        </tr>
+        <tr>
+            <th>Postal code</th>
+            <td>${user.postalCode}</td>
+        </tr>
+        <tr>
+            <th>Money Remaining</th>
+            <td>${user.moneyRemaining}$</td>
+        </tr>
+    </table>
+`
+    return el;
+}
+
+function renderDeck(topCard: Card) {
+    let el = document.createElement("section")
+    el.className = "deck";
+
+    el.appendChild(renderCard(topCard, false));
+    el.appendChild(renderCard(topCard, true));
+
+    return el;
+}
+
+function renderTable(casino: Casino) {
+    let el = document.createElement("div");
+    el.className = "container"
+
+
+    // Render opponent deck
+    el.appendChild(renderHand(casino.game.players[1].hand, false))
+
+    // Render shared deck
+    el.appendChild(renderDeck(casino.game.deck.cards[0]))
+    
+    // Render player deck
+    el.appendChild(renderHand(casino.game.players[0].hand, true))
+
+    return el;
+}
+
+let monkeyUser = new User("Slava", "slava", "1234", "1234", 999);
+
+let casino = new Casino(monkeyUser, false);
+casino.betAmount = 30;
+casino.executeBet()
+
+let root = document.querySelector("body");
+
+// Render info boxes and header
+root.appendChild(renderHeader(casino));
+root.appendChild(renderTable(casino));

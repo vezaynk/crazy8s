@@ -119,6 +119,8 @@ class Game {
         this.discardPile.cards = [this.discardPile.getLastCard()];
         // Good to go!
     }
+    reset() {
+    }
 }
 class DiscardPile {
     constructor(game) {
@@ -210,6 +212,9 @@ class BotPlayer extends Player {
         super(...arguments);
         this.isBot = true;
     }
+    /**
+     * Bot-executed turn. Delays by 300 and plays the first card it can.
+     */
     runTurn() {
         return new Promise(resolve => {
             console.log(`It is ${this.name}'s turn! He has ${this.hand.cards.length} cards remaining.`, [].concat(this.hand.cards));
@@ -264,116 +269,344 @@ class BotPlayer extends Player {
     }
 }
 class Casino {
-    constructor(user, onBetEnd, hasHuman = true) {
+    constructor(user, hasHuman = true) {
         this.betAmount = 0;
-        let game = new Game();
-        let botPlayer = new BotPlayer(game);
-        botPlayer.name = "Bot";
-        let humanPlayer = hasHuman ? new Player(game) : new BotPlayer(game);
-        humanPlayer.name = "Human";
-        game.players.push(humanPlayer, botPlayer);
         this.user = user;
+        this.hasHuman = hasHuman;
     }
     executeBet() {
-        if (this.betAmount > this.user.moneyRemaning) {
-            this.betAmount = 0;
-            console.log("Betting more than has money. Kill.");
-            return;
-        }
+        let game = new Game();
+        this.game = game;
+        let botPlayer = new BotPlayer(game);
+        botPlayer.name = "Bot";
+        let humanPlayer = this.hasHuman ? new Player(game) : new BotPlayer(game);
+        humanPlayer.name = "Human";
+        game.players.push(humanPlayer, botPlayer);
+        return new Promise(async (resolve, reject) => {
+            if (this.betAmount > this.user.moneyRemaining) {
+                this.betAmount = 0;
+                console.log("Betting more than has money. Kill.");
+                return reject();
+            }
+            while (!this.game.isOver()) {
+                await this.game.nextTurn();
+            }
+            let isPlayerWinner = this.game.turn == 0;
+            if (isPlayerWinner) {
+                this.user.moneyRemaining += this.betAmount;
+            }
+            else {
+                this.user.moneyRemaining -= this.betAmount;
+            }
+            resolve(isPlayerWinner);
+        });
     }
 }
 class User {
-    constructor(name, username, phoneNumber, postalCode, moneyRemaning) {
-        Object.assign(this, { name, username, phoneNumber, postalCode, moneyRemaning });
+    constructor(name, username, phoneNumber, postalCode, moneyRemaining) {
+        Object.assign(this, { name, username, phoneNumber, postalCode, moneyRemaining });
     }
 }
-let elShowInfoBox = document.getElementById("showInfoBox");
-let elInfoBox = document.getElementById("infoBox");
-elShowInfoBox.addEventListener("click", function () {
-    if (elInfoBox.style.display == "none") {
-        elInfoBox.style.display = "block";
+function renderCard(card, faceUp) {
+    // Determine primary color
+    let color = "black";
+    if (card.suit == 'H' || card.suit == 'D')
+        color = "red";
+    // Determine card text
+    let text = "";
+    let letter = card.value.toString();
+    // Determine corner text and letter
+    switch (card.value) {
+        case 1:
+            text = "One of ";
+            letter = "A";
+            break;
+        case 2:
+            text = "Two of ";
+            break;
+        case 3:
+            text = "Three of ";
+            break;
+        case 4:
+            text = "Four of ";
+            break;
+        case 5:
+            text = "Five of ";
+            break;
+        case 6:
+            text = "Six of ";
+            break;
+        case 7:
+            text = "Seven of ";
+            break;
+        case 8:
+            text = "Eight of ";
+            break;
+        case 9:
+            text = "Nine of ";
+            break;
+        case 10:
+            text = "Jack of ";
+            letter = "J";
+            break;
+        case 11:
+            text = "Queen of ";
+            letter = "Q";
+            break;
+        case 12:
+            text = "King of ";
+            letter = "K";
+            break;
     }
-    else {
-        elInfoBox.style.display == "none";
+    let entity = "";
+    switch (card.suit) {
+        case 'H':
+            text += "Hearts";
+            entity = "&hearts;";
+            break;
+        case 'C':
+            text += "clubs";
+            entity = "&clubs;";
+            break;
+        case 'D':
+            text += "Diamonds";
+            entity = "&diams;";
+            break;
+        case 'S':
+            text += "Spades";
+            entity = "&spades;";
+            break;
     }
-});
+    let el = document.createElement('div');
+    el.className = `card ${faceUp ? 'front-side' : 'back-side'} ${color}`;
+    let html = (`
+    <div class="card--back">
+        <section>
+        </section>
+        <div class="overlay">
+            <div class="quadrant">
+                <span>&hearts;</span>
+            </div>
+            <div class="quadrant">
+                <span>&spades;</span>
+            </div>
+            <div class="quadrant">
+                <span>&clubs;</span>
+            </div>
+            <div class="quadrant">
+                <span>&diams;</span>
+            </div>
+        </div>
+        <section>
+        </section>
+    </div>
+    <div class="card--front">
+        <header>
+            <span class="number">${letter}</span>
+            <span class="text">${text}</span class="text">
+        </header>
+        <section>
+            ${Array(card.value).fill('<span>' + entity + '</span>').join("")}
+        </section>
+        <header>
+            <span class="number">${letter}</span>
+            <span class="text">${text}</span class="text">
+        </header>
+    </div>
+    `);
+    el.innerHTML = html;
+    return el;
+}
+function renderHand(hand, faceUp) {
+    let elHand = document.createElement('section');
+    elHand.className = "hand";
+    hand.cards.forEach(card => elHand.appendChild(renderCard(card, faceUp)));
+    return elHand;
+}
+function renderHeader(casino) {
+    let elInfo = document.createElement("div");
+    let elTopBar = document.createElement("div");
+    elTopBar.className = "userInfo";
+    elTopBar.innerHTML = `<div class="userInfo">
+    <div class="toolbar">
+        <h1>The Happy Gambler</h1>
+        <p>
+            <span>
+                <a id="showInfoBox" href="#">${casino.user.name}</a>'s turn |</span>
+            <span>Bet: ${casino.betAmount}$ |</span>
+            <span>Pick a card</span>
+        </p>
+    </div>
+</div>`;
+    let elShowInfoBox = elTopBar.querySelector("#showInfoBox");
+    let elInfoBox = renderInfoBox(casino.user);
+    elShowInfoBox.addEventListener("click", function () {
+        elInfoBox.classList.toggle("hidden");
+    });
+    elInfo.appendChild(elTopBar);
+    elInfo.appendChild(elInfoBox);
+    return elInfo;
+}
+function renderInfoBox(user) {
+    let el = document.createElement("div");
+    el.id = "infoBox";
+    el.innerHTML = `
+    <table>
+        <tr>
+            <th>Name</th>
+            <td>${user.name}</td>
+        </tr>
+        <tr>
+            <th>Username</th>
+            <td>${user.username}</td>
+        </tr>
+        <tr>
+            <th>Phone number</th>
+            <td>${user.phoneNumber}</td>
+        </tr>
+        <tr>
+            <th>Postal code</th>
+            <td>${user.postalCode}</td>
+        </tr>
+        <tr>
+            <th>Money Remaining</th>
+            <td>${user.moneyRemaining}$</td>
+        </tr>
+    </table>
+`;
+    return el;
+}
+function renderDeck(topCard) {
+    let el = document.createElement("section");
+    el.className = "deck";
+    el.appendChild(renderCard(topCard, false));
+    el.appendChild(renderCard(topCard, true));
+    return el;
+}
+function renderTable(casino) {
+    let el = document.createElement("div");
+    el.className = "container";
+    // Render opponent deck
+    el.appendChild(renderHand(casino.game.players[1].hand, false));
+    // Render shared deck
+    el.appendChild(renderDeck(casino.game.deck.cards[0]));
+    // Render player deck
+    el.appendChild(renderHand(casino.game.players[0].hand, true));
+    return el;
+}
+let monkeyUser = new User("Slava", "slava", "1234", "1234", 999);
+let casino = new Casino(monkeyUser, false);
+casino.betAmount = 30;
+casino.executeBet();
+let root = document.querySelector("body");
+// Render info boxes and header
+root.appendChild(renderHeader(casino));
+root.appendChild(renderTable(casino));
 // Tests
+/*
 console.log("Testing the deck");
 let deck = new Deck();
+
 console.log("Checking if deck is correctly populated");
-console.assert(deck.cards.length == 52, `There are ${deck.cards.length} deck.cards instead of 52`, deck.cards, deck);
+console.assert(deck.cards.length == 52, `There are ${deck.cards.length} deck.cards instead of 52`, deck.cards, deck)
+
 console.log("Checking individual suits");
-let testSuits = [{ letter: "C", name: "Clubs" }, { letter: "S", name: "Spades" }, { letter: "D", name: "Diamonds" }, { letter: "H", name: "Hearts" }];
+let testSuits = [{ letter: "C", name: "Clubs" }, { letter: "S", name: "Spades" }, { letter: "D", name: "Diamonds" }, { letter: "H", name: "Hearts" }]
 let cardsPerSuit = 13;
 testSuits.forEach(test => {
     console.log(`Testing for ${cardsPerSuit} ${test.name}`);
     let cards = deck.cards.filter(c => {
         return c.suit == test.letter;
-    });
-    console.assert(cards.length == cardsPerSuit, `There are ${cards.length} ${test.name} instead of ${cardsPerSuit}`, cards, deck);
-});
+    })
+    console.assert(cards.length == cardsPerSuit, `There are ${cards.length} ${test.name} instead of ${cardsPerSuit}`, cards, deck)
+})
+
+
 testSuits.forEach(test => {
     console.log(`Testing for 13 unique cards in ${test.name}`);
     let cards = deck.cards.sort((a, b) => a.value - b.value).filter(c => {
         return c.suit == test.letter;
-    });
+    })
     let seqCards = cards.filter((card, index) => {
         return card.value == index + 1;
-    });
-    console.assert(seqCards.length == cardsPerSuit, `Sequence-breaking card value for ${cardsPerSuit}`, cards, deck);
-});
-console.log("Shuffling deck");
-deck.shuffleDeck();
-console.log("Once", deck.cards.map(c => c.suit + c.value).join(" "));
-deck.shuffleDeck();
-console.log("Twice", deck.cards.map(c => c.suit + c.value).join(" "));
-deck.shuffleDeck();
-console.log("Thrice", deck.cards.map(c => c.suit + c.value).join(" "));
-console.log("Shuffling 300 times and checking for duplicate outputs. Tolerating a maximum of 2 matches.");
+    })
+
+    console.assert(seqCards.length == cardsPerSuit, `Sequence-breaking card value for ${cardsPerSuit}`, cards, deck)
+})
+
+console.log("Shuffling deck")
+deck.shuffleDeck()
+console.log("Once", deck.cards.map(c => c.suit + c.value).join(" "))
+deck.shuffleDeck()
+console.log("Twice", deck.cards.map(c => c.suit + c.value).join(" "))
+deck.shuffleDeck()
+console.log("Thrice", deck.cards.map(c => c.suit + c.value).join(" "))
+
+console.log("Shuffling 300 times and checking for duplicate outputs. Tolerating a maximum of 2 matches.")
 let matches = 0;
 let shuffleResults = [];
 Array(300).fill(0).forEach(_ => {
-    deck.shuffleDeck();
-    let text = deck.cards.map(c => c.suit + c.value).join(" ");
+    deck.shuffleDeck()
+    let text = deck.cards.map(c => c.suit + c.value).join(" ")
     if (shuffleResults.indexOf(text) === -1)
-        shuffleResults.push(text);
+        shuffleResults.push(text)
     else
         matches++;
-});
+})
+
 console.assert(matches <= 2, "Too many matches after shuffling");
+
 console.log("Test playing all cards");
 let playedCards = [];
+
 while (!deck.isEmpty) {
     playedCards.push(deck.drawCard());
 }
+
 console.log("Testing if all cards were played.");
 testSuits.forEach(test => {
     console.log(`Testing for 13 unique cards in ${test.name}`);
     let cards = playedCards.sort((a, b) => a.value - b.value).filter(c => {
         return c.suit == test.letter;
-    });
+    })
     let seqCards = cards.filter((card, index) => {
         return card.value == index + 1;
-    });
-    console.assert(seqCards.length == cardsPerSuit, `Sequence-breaking card value for ${cardsPerSuit}`, cards, deck);
-});
-console.log("Executing game with 2 bot players");
-/*let human = new User("Slava", "slava", "1234", "1234", 999);
-let bet = new Bet(30, human, ()=>{
-    console.log(human.name, "now has", human.moneyRemaning)
-}, false);
+    })
 
-bet.run();*/
+    console.assert(seqCards.length == cardsPerSuit, `Sequence-breaking card value for ${cardsPerSuit}`, cards, deck)
+})
+
+
+console.log("Executing game with 2 bot players")
 let game = new Game();
-let humanPlayer = new Player(game);
+let humanPlayer = new BotPlayer(game);
 humanPlayer.name = "Human";
 let botPlayer = new BotPlayer(game);
 botPlayer.name = "Bot";
+
 game.players.push(humanPlayer, botPlayer);
+
 async function runGame() {
     while (!game.isOver()) {
         await game.nextTurn();
     }
 }
-runGame();
+
+//runGame();
+
+console.log("Executing bet with 2 bot players")
+let monkeyUser = new User("Slava", "slava", "1234", "1234", 999);
+
+let casino = new Casino(monkeyUser, false);
+casino.betAmount = 30;
+
+
+casino.executeBet().then(won=>{
+  if (won) {
+    console.log("The player won and now has $" + monkeyUser.moneyRemaining);
+  } else {
+    console.log("The player lost and now has $" + monkeyUser.moneyRemaining);
+  }
+});
+*/ 
 //# sourceMappingURL=build.js.map

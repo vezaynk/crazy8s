@@ -144,6 +144,10 @@ class Game {
 
         // Good to go!
     }
+
+    reset() {
+
+    }
 }
 
 class DiscardPile {
@@ -247,6 +251,9 @@ class Player {
 class BotPlayer extends Player {
     isBot = true
 
+    /**
+     * Bot-executed turn. Delays by 300 and plays the first card it can.
+     */
     runTurn(): Promise<any> {
         return new Promise(resolve => {
             console.log(`It is ${this.name}'s turn! He has ${this.hand.cards.length} cards remaining.`, [].concat(this.hand.cards))
@@ -313,32 +320,51 @@ class BotPlayer extends Player {
 }
 
 class Casino {
-    onGameEnded: (moneyRemaningChange: number) => void;
+    onGameEnded: (moneyRemainingChange: number) => void;
     game: Game;
     user: User;
     betAmount: number = 0;
-    constructor(user: User, onBetEnd: () => void, hasHuman: boolean = true) {
+    hasHuman: boolean;
+    constructor(user: User, hasHuman: boolean = true) {
 
+        this.user = user;
+        this.hasHuman = hasHuman;
+
+
+    }
+
+    executeBet(): Promise<boolean> {
         let game = new Game();
+        this.game = game;
         let botPlayer = new BotPlayer(game);
         botPlayer.name = "Bot";
 
 
-        let humanPlayer = hasHuman ? new Player(game) : new BotPlayer(game);
+        let humanPlayer = this.hasHuman ? new Player(game) : new BotPlayer(game);
         humanPlayer.name = "Human";
-        
+
         game.players.push(humanPlayer, botPlayer);
-        this.user = user;
-    }
 
-    executeBet() {
-        if (this.betAmount > this.user.moneyRemaning) {
-            this.betAmount = 0;
-            console.log("Betting more than has money. Kill.")
-            return;
-        }
+        return new Promise(async (resolve, reject) => {
+            if (this.betAmount > this.user.moneyRemaining) {
+                this.betAmount = 0;
+                console.log("Betting more than has money. Kill.")
+                return reject();
+            }
 
-        
+            while (!this.game.isOver()) {
+                await this.game.nextTurn();
+            }
+
+            let isPlayerWinner = this.game.turn == 0;
+            if (isPlayerWinner) {
+                this.user.moneyRemaining += this.betAmount;
+            } else {
+                this.user.moneyRemaining -= this.betAmount;
+            }
+            resolve(isPlayerWinner);
+        })
+
     }
 }
 
@@ -347,8 +373,8 @@ class User {
     username: string
     phoneNumber: string
     postalCode: string
-    moneyRemaning: number
-    constructor(name: string, username: string, phoneNumber: string, postalCode: string, moneyRemaning: number) {
-        Object.assign(this, { name, username, phoneNumber, postalCode, moneyRemaning });
+    moneyRemaining: number
+    constructor(name: string, username: string, phoneNumber: string, postalCode: string, moneyRemaining: number) {
+        Object.assign(this, { name, username, phoneNumber, postalCode, moneyRemaining });
     }
 }
