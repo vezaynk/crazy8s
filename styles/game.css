@@ -22,7 +22,7 @@ body {
     flex-direction: row;
     flex-wrap: nowrap;
     overflow-x: auto;
-    justify-content: space-between;
+    justify-content: start;
 }
 
 .hand .card {

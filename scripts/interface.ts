@@ -38,14 +38,17 @@ function renderCard(card: Card, faceUp: boolean) {
             text = "Nine of "
             break;
         case 10:
+            text = "Ten of "
+            break;
+        case 11:
             text = "Jack of "
             letter = "J";
             break;
-        case 11:
+        case 12:
             text = "Queen of "
             letter = "Q";
             break;
-        case 12:
+        case 13:
             text = "King of "
             letter = "K";
             break;
@@ -76,6 +79,9 @@ function renderCard(card: Card, faceUp: boolean) {
     }
 
     let el = document.createElement('div');
+    el.setAttribute("data-suit", card.suit);
+    el.setAttribute("data-value", card.value.toString());
+
     el.className = `card ${faceUp ? 'front-side' : 'back-side'} ${color}`
     let html = (`
     <div class="card--back">
@@ -104,7 +110,7 @@ function renderCard(card: Card, faceUp: boolean) {
             <span class="text">${text}</span class="text">
         </header>
         <section>
-            ${Array(card.value).fill('<span>' + entity + '</span>').join("")}
+            ${card.value <= 10 ? Array(card.value).fill('<span>' + entity + '</span>').join("") : `<span>${letter}</span>`}
         </section>
         <header>
             <span class="number">${letter}</span>
@@ -206,22 +212,54 @@ function renderTable(casino: Casino) {
     el.appendChild(renderHand(casino.game.players[1].hand, false))
 
     // Render shared deck
-    el.appendChild(renderDeck(casino.game.deck.cards[0]))
-    
+    el.appendChild(renderDeck(casino.game.discardPile.cards[casino.game.discardPile.cards.length - 1]))
+
     // Render player deck
     el.appendChild(renderHand(casino.game.players[0].hand, true))
 
     return el;
 }
 
-let monkeyUser = new User("Slava", "slava", "1234", "1234", 999);
+function renderView(root: Element, casino: Casino) {
+    root.innerHTML = "";
 
-let casino = new Casino(monkeyUser, false);
-casino.betAmount = 30;
-casino.executeBet()
+    // Render info boxes and header
+    root.appendChild(renderHeader(casino));
+
+    // Render everything else
+    let handPlayer = renderTable(casino);
+    handPlayer.children.item(2).id = "hand-player";
+    root.appendChild(handPlayer);
+}
+
+function userSelectCard(resolve) {
+    let cards = [...root.querySelectorAll("#hand-player .card")];
+    cards.forEach((elCard, index) => {
+
+        elCard.addEventListener("click", function () {
+            let playable = casino.game.discardPile.canPlayCard({
+                suit: this.getAttribute("data-suit"),
+                value: +this.getAttribute("data-value")
+            })
+
+            if (playable)
+                resolve(index)
+            else
+                alert("Nope")
+        })
+
+    })
+}
 
 let root = document.querySelector("body");
+let monkeyUser = new User("Slava", "slava", "1234", "1234", 999);
 
-// Render info boxes and header
-root.appendChild(renderHeader(casino));
-root.appendChild(renderTable(casino));
+
+let casino = new Casino(monkeyUser, true);
+
+casino.betAmount = 30;
+casino.renderHook = function () {
+    renderView(root, casino);
+}
+casino.executeBet()
+

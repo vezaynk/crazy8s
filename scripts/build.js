@@ -78,10 +78,10 @@ class Deck {
 class Game {
     constructor() {
         this.deck = new Deck();
-        this.discardPile = new DiscardPile(this);
         this.turn = -1;
         this.players = [];
         this.deck.shuffleDeck(12);
+        this.discardPile = new DiscardPile(this);
     }
     nextTurn() {
         if (this.isOver()) {
@@ -179,12 +179,21 @@ class Player {
         }
     }
     /**
+     *
+     */
+    getCardIndexToPlay() {
+        return new Promise(userSelectCard);
+    }
+    /**
      * Executes whatever is necessary to run the turn
      * @param done Callback for when turn is finished
      */
     runTurn() {
-        return new Promise((resolve) => {
+        return new Promise(async (resolve) => {
             console.log("Human was suppose to play");
+            let cardIndex = await this.getCardIndexToPlay();
+            let card = this.hand.cards[cardIndex];
+            console.log(card);
             resolve();
             // TODO: Allow human player to play (Interaction with DOM required)
         });
@@ -212,6 +221,12 @@ class BotPlayer extends Player {
         super(...arguments);
         this.isBot = true;
     }
+    getCardIndexToPlay() {
+        return new Promise(resolve => {
+            let index = this.hand.cards.findIndex((card, index) => this.game.discardPile.canPlayCard(card));
+            resolve(index);
+        });
+    }
     /**
      * Bot-executed turn. Delays by 300 and plays the first card it can.
      */
@@ -219,37 +234,11 @@ class BotPlayer extends Player {
         return new Promise(resolve => {
             console.log(`It is ${this.name}'s turn! He has ${this.hand.cards.length} cards remaining.`, [].concat(this.hand.cards));
             // Artificial delay before playing
-            setTimeout(_ => {
-                // Look for a playable card and play it if possible
-                let playedCard = this.hand.cards.find((card, index) => {
-                    if (this.game.discardPile.canPlayCard(card)) {
-                        // Pick rando suit to change to
-                        if (card.value == 8) {
-                            switch (Math.floor(Math.random() * 4)) {
-                                case 0:
-                                    card.suit = 'S';
-                                    break;
-                                case 1:
-                                    card.suit = 'C';
-                                    break;
-                                case 2:
-                                    card.suit = 'D';
-                                    break;
-                                case 3:
-                                    card.suit = 'H';
-                                    break;
-                            }
-                            console.log("An 8 was played! Changing suit to", card.suit);
-                        }
-                        this.hand.dropCard(index);
-                        this.game.discardPile.putCard(card);
-                        console.log(`${this.name} is Playing`, card);
-                        return true;
-                    }
-                    return false;
-                });
+            setTimeout(async (_) => {
+                let cardIndex = await this.getCardIndexToPlay();
+                let card = this.hand.cards[cardIndex];
                 // No playable card was found
-                if (!playedCard) {
+                if (!card) {
                     if (!this.game.deck.isEmpty) {
                         console.log(`${this.name} could not play any card. Drawing.`);
                     }
@@ -262,6 +251,28 @@ class BotPlayer extends Player {
                     this.hand.addCard(newCard);
                     console.log("Drew", newCard);
                 }
+                else {
+                    if (card.value == 8) {
+                        switch (Math.floor(Math.random() * 4)) {
+                            case 0:
+                                card.suit = 'S';
+                                break;
+                            case 1:
+                                card.suit = 'C';
+                                break;
+                            case 2:
+                                card.suit = 'D';
+                                break;
+                            case 3:
+                                card.suit = 'H';
+                                break;
+                        }
+                        console.log("An 8 was played! Changing suit to", card.suit);
+                    }
+                    this.hand.dropCard(cardIndex);
+                    this.game.discardPile.putCard(card);
+                    console.log(`${this.name} is Playing`, card);
+                }
                 console.log(`Turn is finished, ending turn`);
                 return resolve();
             }, 300);
@@ -271,6 +282,7 @@ class BotPlayer extends Player {
 class Casino {
     constructor(user, hasHuman = true) {
         this.betAmount = 0;
+        this.renderHook = function () { };
         this.user = user;
         this.hasHuman = hasHuman;
     }
@@ -288,9 +300,12 @@ class Casino {
                 console.log("Betting more than has money. Kill.");
                 return reject();
             }
+            this.renderHook();
             while (!this.game.isOver()) {
                 await this.game.nextTurn();
+                this.renderHook();
             }
+            this.renderHook();
             let isPlayerWinner = this.game.turn == 0;
             if (isPlayerWinner) {
                 this.user.moneyRemaining += this.betAmount;
@@ -346,14 +361,17 @@ function renderCard(card, faceUp) {
             text = "Nine of ";
             break;
         case 10:
+            text = "Ten of ";
+            break;
+        case 11:
             text = "Jack of ";
             letter = "J";
             break;
-        case 11:
+        case 12:
             text = "Queen of ";
             letter = "Q";
             break;
-        case 12:
+        case 13:
             text = "King of ";
             letter = "K";
             break;
@@ -378,6 +396,8 @@ function renderCard(card, faceUp) {
             break;
     }
     let el = document.createElement('div');
+    el.setAttribute("data-suit", card.suit);
+    el.setAttribute("data-value", card.value.toString());
     el.className = `card ${faceUp ? 'front-side' : 'back-side'} ${color}`;
     let html = (`
     <div class="card--back">
@@ -406,7 +426,7 @@ function renderCard(card, faceUp) {
             <span class="text">${text}</span class="text">
         </header>
         <section>
-            ${Array(card.value).fill('<span>' + entity + '</span>').join("")}
+            ${card.value <= 10 ? Array(card.value).fill('<span>' + entity + '</span>').join("") : `<span>${letter}</span>`}
         </section>
         <header>
             <span class="number">${letter}</span>
@@ -489,19 +509,43 @@ function renderTable(casino) {
     // Render opponent deck
     el.appendChild(renderHand(casino.game.players[1].hand, false));
     // Render shared deck
-    el.appendChild(renderDeck(casino.game.deck.cards[0]));
+    el.appendChild(renderDeck(casino.game.discardPile.cards[casino.game.discardPile.cards.length - 1]));
     // Render player deck
     el.appendChild(renderHand(casino.game.players[0].hand, true));
     return el;
 }
-let monkeyUser = new User("Slava", "slava", "1234", "1234", 999);
-let casino = new Casino(monkeyUser, false);
-casino.betAmount = 30;
-casino.executeBet();
+function renderView(root, casino) {
+    root.innerHTML = "";
+    // Render info boxes and header
+    root.appendChild(renderHeader(casino));
+    // Render everything else
+    let handPlayer = renderTable(casino);
+    handPlayer.children.item(2).id = "hand-player";
+    root.appendChild(handPlayer);
+}
+function userSelectCard(resolve) {
+    let cards = [...root.querySelectorAll("#hand-player .card")];
+    cards.forEach((elCard, index) => {
+        elCard.addEventListener("click", function () {
+            let playable = casino.game.discardPile.canPlayCard({
+                suit: this.getAttribute("data-suit"),
+                value: +this.getAttribute("data-value")
+            });
+            if (playable)
+                resolve(index);
+            else
+                alert("Nope");
+        });
+    });
+}
 let root = document.querySelector("body");
-// Render info boxes and header
-root.appendChild(renderHeader(casino));
-root.appendChild(renderTable(casino));
+let monkeyUser = new User("Slava", "slava", "1234", "1234", 999);
+let casino = new Casino(monkeyUser, true);
+casino.betAmount = 30;
+casino.renderHook = function () {
+    renderView(root, casino);
+};
+casino.executeBet();
 // Tests
 /*
 console.log("Testing the deck");

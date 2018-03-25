@@ -1,5 +1,5 @@
 interface Card {
-    suit: "C" | "H" | "D" | "S",
+    suit: string, //"C" | "H" | "D" | "S",
     value: number
 }
 
@@ -95,12 +95,13 @@ class Deck {
 
 class Game {
     deck: Deck = new Deck()
-    discardPile: DiscardPile = new DiscardPile(this)
+    discardPile: DiscardPile;
     turn: number = -1
     players: Player[] = [];
 
     constructor() {
         this.deck.shuffleDeck(12)
+        this.discardPile = new DiscardPile(this)
     }
     nextTurn() {
         if (this.isOver()) {
@@ -207,6 +208,7 @@ class Player {
     name: string = "unknown"
     skipTurn: boolean = false;
     isBot: boolean = false;
+
     constructor(game: Game) {
         this.hand = new Hand();
         this.game = game;
@@ -217,12 +219,22 @@ class Player {
     }
 
     /**
+     * 
+     */
+    getCardIndexToPlay(): Promise<number> {
+        return new Promise(userSelectCard)
+    }
+
+    /**
      * Executes whatever is necessary to run the turn
      * @param done Callback for when turn is finished
      */
     runTurn(): Promise<any> {
-        return new Promise((resolve) => {
+        return new Promise(async (resolve) => {
             console.log("Human was suppose to play")
+            let cardIndex = await this.getCardIndexToPlay();
+            let card = this.hand.cards[cardIndex];
+            console.log(card)
             resolve();
             // TODO: Allow human player to play (Interaction with DOM required)
         });
@@ -251,6 +263,13 @@ class Player {
 class BotPlayer extends Player {
     isBot = true
 
+    getCardIndexToPlay(): Promise<number> {
+        return new Promise(resolve => {
+            let index = this.hand.cards.findIndex((card, index) => this.game.discardPile.canPlayCard(card));
+            resolve(index);
+        })
+    }
+
     /**
      * Bot-executed turn. Delays by 300 and plays the first card it can.
      */
@@ -258,43 +277,16 @@ class BotPlayer extends Player {
         return new Promise(resolve => {
             console.log(`It is ${this.name}'s turn! He has ${this.hand.cards.length} cards remaining.`, [].concat(this.hand.cards))
 
+
             // Artificial delay before playing
-            setTimeout(_ => {
+            setTimeout(async _ => {
+                let cardIndex = await this.getCardIndexToPlay();
+                let card = this.hand.cards[cardIndex];
 
-                // Look for a playable card and play it if possible
-                let playedCard = this.hand.cards.find((card, index) => {
-                    if (this.game.discardPile.canPlayCard(card)) {
 
-                        // Pick rando suit to change to
-
-                        if (card.value == 8) {
-                            switch (Math.floor(Math.random() * 4)) {
-                                case 0:
-                                    card.suit = 'S';
-                                    break;
-                                case 1:
-                                    card.suit = 'C';
-                                    break;
-                                case 2:
-                                    card.suit = 'D';
-                                    break;
-                                case 3:
-                                    card.suit = 'H';
-                                    break;
-                            }
-                            console.log("An 8 was played! Changing suit to", card.suit)
-                        }
-
-                        this.hand.dropCard(index);
-                        this.game.discardPile.putCard(card);
-                        console.log(`${this.name} is Playing`, card);
-                        return true;
-                    }
-                    return false;
-                });
 
                 // No playable card was found
-                if (!playedCard) {
+                if (!card) {
                     if (!this.game.deck.isEmpty) {
                         console.log(`${this.name} could not play any card. Drawing.`)
                     } else {
@@ -306,11 +298,31 @@ class BotPlayer extends Player {
                     let newCard = this.game.deck.drawCard();
                     this.hand.addCard(newCard);
                     console.log("Drew", newCard);
+                } else {
+                    if (card.value == 8) {
+                        switch (Math.floor(Math.random() * 4)) {
+                            case 0:
+                                card.suit = 'S';
+                                break;
+                            case 1:
+                                card.suit = 'C';
+                                break;
+                            case 2:
+                                card.suit = 'D';
+                                break;
+                            case 3:
+                                card.suit = 'H';
+                                break;
+                        }
+                        console.log("An 8 was played! Changing suit to", card.suit)
+                    }
+                    this.hand.dropCard(cardIndex);
+                    this.game.discardPile.putCard(card);
+                    console.log(`${this.name} is Playing`, card);
                 }
 
 
                 console.log(`Turn is finished, ending turn`);
-
                 return resolve();
 
             }, 300)
@@ -325,6 +337,8 @@ class Casino {
     user: User;
     betAmount: number = 0;
     hasHuman: boolean;
+    renderHook: () => void = function () { };
+
     constructor(user: User, hasHuman: boolean = true) {
 
         this.user = user;
@@ -352,9 +366,12 @@ class Casino {
                 return reject();
             }
 
+            this.renderHook();
             while (!this.game.isOver()) {
                 await this.game.nextTurn();
+                this.renderHook();
             }
+            this.renderHook();
 
             let isPlayerWinner = this.game.turn == 0;
             if (isPlayerWinner) {
