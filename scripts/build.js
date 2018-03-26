@@ -178,10 +178,16 @@ class Player {
         }
     }
     /**
-     *
+     * Reaches out to `userSelectCard` function to get an index for a card
      */
     getCardIndexToPlay() {
         return new Promise(userSelectCard);
+    }
+    /**
+     * Reaches out to `userSelectSuit` function to get a new suit
+     */
+    pickCrazySuit() {
+        return new Promise(userSelectSuit);
     }
     /**
      * Executes whatever is necessary to run the turn
@@ -206,6 +212,13 @@ class Player {
                 console.log("Drew", newCard);
             }
             else {
+                if (card.value == 8) {
+                    card.suit = await this.pickCrazySuit();
+                    console.log("An 8 was played! Changing suit to", card.suit);
+                }
+                this.hand.dropCard(cardIndex);
+                this.game.discardPile.putCard(card);
+                console.log(`${this.name} is Playing`, card);
             }
             resolve();
         });
@@ -237,7 +250,28 @@ class BotPlayer extends Player {
         });
     }
     /**
-     * Bot-executed turn. Delays by 300 and plays the first card it can.
+     * Randomly select a new suit
+     */
+    pickCrazySuit() {
+        return new Promise((resolve) => {
+            switch (Math.floor(Math.random() * 4)) {
+                case 0:
+                    resolve('S');
+                    break;
+                case 1:
+                    resolve('C');
+                    break;
+                case 2:
+                    resolve('D');
+                    break;
+                case 3:
+                    resolve('H');
+                    break;
+            }
+        });
+    }
+    /**
+     * Bot-executed turn. Delays by 2000 and plays the first card it can.
      */
     runTurn() {
         return new Promise(resolve => {
@@ -262,20 +296,7 @@ class BotPlayer extends Player {
                 }
                 else {
                     if (card.value == 8) {
-                        switch (Math.floor(Math.random() * 4)) {
-                            case 0:
-                                card.suit = 'S';
-                                break;
-                            case 1:
-                                card.suit = 'C';
-                                break;
-                            case 2:
-                                card.suit = 'D';
-                                break;
-                            case 3:
-                                card.suit = 'H';
-                                break;
-                        }
+                        card.suit = await this.pickCrazySuit();
                         console.log("An 8 was played! Changing suit to", card.suit);
                     }
                     this.hand.dropCard(cardIndex);
@@ -284,7 +305,7 @@ class BotPlayer extends Player {
                 }
                 console.log(`Turn is finished, ending turn`);
                 return resolve();
-            }, 300);
+            }, 2000);
         });
     }
 }
@@ -469,6 +490,7 @@ function renderHeader(casino) {
 </div>`;
     let elShowInfoBox = elTopBar.querySelector("#showInfoBox");
     let elInfoBox = renderInfoBox(casino.user);
+    elInfoBox.classList.toggle("hidden");
     elShowInfoBox.addEventListener("click", function () {
         elInfoBox.classList.toggle("hidden");
     });
@@ -526,6 +548,13 @@ function renderTable(casino) {
     el.appendChild(renderHand(casino.game.players[0].hand, true));
     return el;
 }
+function renderSuitSelector() {
+    let el = document.createElement('div');
+    el.classList.add('modal');
+    el.innerHTML = `
+    
+    `;
+}
 function renderView(root, casino) {
     root.innerHTML = "";
     // Render info boxes and header
@@ -546,10 +575,15 @@ function userSelectCard(resolve) {
             });
             if (playable)
                 resolve(index);
-            else
-                alert("Nope");
         });
     });
+    let deck = root.querySelector(".deck .card.back-side");
+    deck.addEventListener('click', function () {
+        resolve(-1);
+    });
+}
+function userSelectSuit(resolve) {
+    resolve('H');
 }
 let root = document.querySelector("body");
 let monkeyUser = new User("Slava", "slava", "1234", "1234", 999);

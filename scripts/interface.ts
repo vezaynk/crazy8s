@@ -153,6 +153,8 @@ function renderHeader(casino: Casino) {
     let elInfoBox = renderInfoBox(casino.user);
 
 
+    elInfoBox.classList.toggle("hidden")
+
     elShowInfoBox.addEventListener("click", function () {
         elInfoBox.classList.toggle("hidden")
     })
@@ -224,6 +226,14 @@ function renderTable(casino: Casino) {
     return el;
 }
 
+function renderSuitSelector() {
+    let el = document.createElement('div')
+    el.classList.add('modal')
+    el.innerHTML = `
+    
+    `
+}
+
 function renderView(root: Element, casino: Casino) {
     root.innerHTML = "";
 
@@ -249,11 +259,19 @@ function userSelectCard(resolve) {
 
             if (playable)
                 resolve(index)
-            else
-                alert("Nope")
         })
 
     })
+
+    let deck = root.querySelector(".deck .card.back-side");
+
+    deck.addEventListener('click', function () {
+        resolve(-1);
+    })
+}
+
+function userSelectSuit(resolve) {
+    resolve('H');
 }
 
 let root = document.querySelector("body");
