@@ -259,6 +259,7 @@ body {
 .card--front section span:last-child:first-child {
     font-size: 4em;
 }
+
 /* Size modifiers */
 
 @media (max-width: 320px) {

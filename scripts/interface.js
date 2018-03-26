@@ -1,88 +1,80 @@
-function renderCard(card: Card, faceUp: boolean) {
+function renderCard(card, faceUp) {
     // Determine primary color
-    let color: "red" | "black" = "black"
+    let color = "black";
     if (card.suit == 'H' || card.suit == 'D')
-        color = "red"
-
+        color = "red";
     // Determine card text
     let text = "";
     let letter = card.value.toString();
     // Determine corner text and letter
     switch (card.value) {
         case 1:
-            text = "One of "
+            text = "One of ";
             letter = "A";
             break;
         case 2:
-            text = "Two of "
+            text = "Two of ";
             break;
         case 3:
-            text = "Three of "
+            text = "Three of ";
             break;
         case 4:
-            text = "Four of "
+            text = "Four of ";
             break;
         case 5:
-            text = "Five of "
+            text = "Five of ";
             break;
         case 6:
-            text = "Six of "
+            text = "Six of ";
             break;
         case 7:
-            text = "Seven of "
+            text = "Seven of ";
             break;
         case 8:
-            text = "Eight of "
+            text = "Eight of ";
             break;
         case 9:
-            text = "Nine of "
+            text = "Nine of ";
             break;
         case 10:
-            text = "Ten of "
+            text = "Ten of ";
             break;
         case 11:
-            text = "Jack of "
+            text = "Jack of ";
             letter = "J";
             break;
         case 12:
-            text = "Queen of "
+            text = "Queen of ";
             letter = "Q";
             break;
         case 13:
-            text = "King of "
+            text = "King of ";
             letter = "K";
             break;
     }
-
     let entity = "";
     switch (card.suit) {
         case 'H':
-            text += "Hearts"
-            entity = "&hearts;"
+            text += "Hearts";
+            entity = "&hearts;";
             break;
-
         case 'C':
-            text += "clubs"
-            entity = "&clubs;"
+            text += "clubs";
+            entity = "&clubs;";
             break;
-
         case 'D':
-            text += "Diamonds"
-            entity = "&diams;"
+            text += "Diamonds";
+            entity = "&diams;";
             break;
-
         case 'S':
-            text += "Spades"
-            entity = "&spades;"
+            text += "Spades";
+            entity = "&spades;";
             break;
-
     }
-
     let el = document.createElement('div');
     el.setAttribute("data-suit", card.suit);
     el.setAttribute("data-value", card.value.toString());
-
-    el.className = `card ${faceUp ? 'front-side' : 'back-side'} ${color}`
+    el.className = `card ${faceUp ? 'front-side' : 'back-side'} ${color}`;
     let html = (`
     <div class="card--back">
         <section>
@@ -117,25 +109,20 @@ function renderCard(card: Card, faceUp: boolean) {
             <span class="text">${text}</span class="text">
         </header>
     </div>
-    `)
+    `);
     el.innerHTML = html;
-
     return el;
 }
-
-function renderHand(hand: Hand, faceUp: boolean) {
+function renderHand(hand, faceUp) {
     let elHand = document.createElement('section');
     elHand.className = "hand";
     hand.cards.forEach(card => elHand.appendChild(renderCard(card, faceUp)));
-
     return elHand;
 }
-
-function renderHeader(casino: Casino) {
+function renderHeader(casino) {
     let elInfo = document.createElement("div");
-
-    let elTopBar = document.createElement("div")
-    elTopBar.className = "userInfo"
+    let elTopBar = document.createElement("div");
+    elTopBar.className = "userInfo";
     elTopBar.innerHTML = `<div class="userInfo">
     <div class="toolbar">
         <h1>The Happy Gambler</h1>
@@ -147,29 +134,20 @@ function renderHeader(casino: Casino) {
         </p>
     </div>
 </div>`;
-
     let elShowInfoBox = elTopBar.querySelector("#showInfoBox");
-
     let elInfoBox = renderInfoBox(casino.user);
-
-
-    elInfoBox.classList.toggle("hidden")
-
+    elInfoBox.classList.toggle("hidden");
     elShowInfoBox.addEventListener("click", function () {
-        elInfoBox.classList.toggle("hidden")
-    })
-
+        elInfoBox.classList.toggle("hidden");
+    });
     elInfoBox.addEventListener("click", function () {
-        elInfoBox.classList.toggle("hidden")
-    })
-
+        elInfoBox.classList.toggle("hidden");
+    });
     elInfo.appendChild(elTopBar);
-    elInfo.appendChild(elInfoBox)
-
+    elInfo.appendChild(elInfoBox);
     return elInfo;
 }
-
-function renderInfoBox(user: User) {
+function renderInfoBox(user) {
     let el = document.createElement("div");
     el.id = "infoBox";
     el.innerHTML = `
@@ -195,40 +173,30 @@ function renderInfoBox(user: User) {
             <td>${user.moneyRemaining}$</td>
         </tr>
     </table>
-`
+`;
     return el;
 }
-
-function renderDeck(topCard: Card) {
-    let el = document.createElement("section")
+function renderDeck(topCard) {
+    let el = document.createElement("section");
     el.classList.add("deck");
-
     el.appendChild(renderCard(topCard, false));
     el.appendChild(renderCard(topCard, true));
-
     return el;
 }
-
-function renderTable(casino: Casino) {
+function renderTable(casino) {
     let el = document.createElement("div");
-    el.className = "container"
-
-
+    el.className = "container";
     // Render opponent deck
-    el.appendChild(renderHand(casino.game.players[1].hand, false))
-
+    el.appendChild(renderHand(casino.game.players[1].hand, false));
     // Render shared deck
-    el.appendChild(renderDeck(casino.game.discardPile.cards[casino.game.discardPile.cards.length - 1]))
-
+    el.appendChild(renderDeck(casino.game.discardPile.cards[casino.game.discardPile.cards.length - 1]));
     // Render player deck
-    el.appendChild(renderHand(casino.game.players[0].hand, true))
-
+    el.appendChild(renderHand(casino.game.players[0].hand, true));
     return el;
 }
-
 function renderSuitSelector() {
-    let el = document.createElement('div')
-    el.classList.add('modal')
+    let el = document.createElement('div');
+    el.classList.add('modal');
     el.innerHTML = `
         <div class="modal-contents">
         <h1> Crazy 8 </h1>
@@ -239,49 +207,39 @@ function renderSuitSelector() {
         <button class="selector">&hearts;</button>
         <p>The card will take the suit of the one selected above</p>
         </div>
-    `
+    `;
     return el;
 }
-
-function renderView(root: Element, casino: Casino) {
+function renderView(root, casino) {
     root.innerHTML = "";
-
     // Render info boxes and header
     root.appendChild(renderHeader(casino));
-
     // Render everything else
     let handPlayer = renderTable(casino);
     handPlayer.children.item(0).id = "hand-bot";
     handPlayer.children.item(2).id = "hand-player";
     root.appendChild(handPlayer);
 }
-
 function userSelectCard(resolve) {
     let cards = [...root.querySelectorAll("#hand-player .card")];
     cards.forEach((elCard, index) => {
-
         elCard.addEventListener("click", function () {
             let playable = casino.game.discardPile.canPlayCard({
                 suit: this.getAttribute("data-suit"),
                 value: +this.getAttribute("data-value")
-            })
-
+            });
             if (playable)
-                resolve(index)
-        })
-
-    })
-
+                resolve(index);
+        });
+    });
     let deck = root.querySelector(".deck .card.back-side");
-
     deck.addEventListener('click', function () {
         resolve(-1);
-    })
+    });
 }
-
 function userSelectSuit(resolve) {
     let el = renderSuitSelector();
-    [...el.querySelectorAll(".selector")].forEach((s, i)=>{
+    [...el.querySelectorAll(".selector")].forEach((s, i) => {
         s.addEventListener("click", function () {
             switch (i) {
                 case 0:
@@ -297,22 +255,17 @@ function userSelectSuit(resolve) {
                     resolve('H');
                     break;
             }
-        })
-    })
+        });
+    });
     root.appendChild(el);
 }
-
 let root = document.querySelector("body");
 let monkeyUser = new User("Slava", "slava", "1234", "1234", 999);
-
-
 let casino = new Casino(monkeyUser, true);
-
 casino.betAmount = 30;
 casino.renderHook = function () {
     renderView(root, casino);
-}
-casino.executeBet().then(isWinner=>{
-    
-})
-
+};
+casino.executeBet().then(isWinner => {
+});
+//# sourceMappingURL=interface.js.map

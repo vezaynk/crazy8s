@@ -1,0 +1,47 @@
+.field {
+    position: relative;
+}
+
+.field label {
+    position: absolute;
+    top: 20px;
+    left: 10px;
+    pointer-events: none;
+    color: rgb(33, 33, 33);
+    transition: all 0.5s ease;
+}
+
+input {
+    height: 2em;
+    margin: 10px;
+    border: none;
+    border-bottom: 1px solid rgb(66, 66, 66);
+    transition: all 0.5s ease;
+}
+
+.field input:focus~label,
+.field input.valid~label,
+.field input.invalid~label {
+    transform: translateY(-1.4em);
+    color: rgb(66, 66, 66);
+    font-size: 0.7em;
+}
+
+.field input:focus {
+    border-bottom: 1px solid rgb(32, 32, 32);
+}
+
+.field input.invalid {
+    border-bottom: 1px solid rgb(199, 0, 0);
+    color: rgb(199, 0, 0);
+}
+
+#btn {
+    background-color: transparent;
+}
+
+.error {
+    display: block;
+    color: red;
+    font-size: .7em;
+}

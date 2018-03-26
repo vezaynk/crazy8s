@@ -3,10 +3,8 @@
     "target": "esnext",
     "removeComments": false,
     "preserveConstEnums": true,
-    "outFile": "./scripts/build.js",
     "sourceRoot": "./scripts/",
     "rootDir": "./scripts/",
-    "module": "system",
     "sourceMap": true
   }
 }
