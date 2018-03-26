@@ -259,13 +259,4 @@ function userSelectSuit(resolve) {
     });
     root.appendChild(el);
 }
-let root = document.querySelector("body");
-let monkeyUser = new User("Slava", "slava", "1234", "1234", 999);
-let casino = new Casino(monkeyUser, true);
-casino.betAmount = 30;
-casino.renderHook = function () {
-    renderView(root, casino);
-};
-casino.executeBet().then(isWinner => {
-});
 //# sourceMappingURL=interface.js.map

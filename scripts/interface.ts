@@ -243,6 +243,20 @@ function renderSuitSelector() {
     return el;
 }
 
+function renderBettingMenu() {
+    let el = document.createElement('div')
+    el.classList.add('modal')
+    el.innerHTML = `
+        <div class="modal-contents">
+        <h1> Crazy 8s </h1>
+        <h2> Make a bet </h2>
+        <input type="number">
+        <p>The card will take the suit of the one selected above</p>
+        </div>
+    `
+    return el;
+}
+
 function renderView(root: Element, casino: Casino) {
     root.innerHTML = "";
 
@@ -302,17 +316,7 @@ function userSelectSuit(resolve) {
     root.appendChild(el);
 }
 
-let root = document.querySelector("body");
-let monkeyUser = new User("Slava", "slava", "1234", "1234", 999);
+function displayMenu() {
 
-
-let casino = new Casino(monkeyUser, true);
-
-casino.betAmount = 30;
-casino.renderHook = function () {
-    renderView(root, casino);
 }
-casino.executeBet().then(isWinner=>{
-    
-})
 
