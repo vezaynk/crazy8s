@@ -110,7 +110,7 @@ function renderCard(card: Card, faceUp: boolean) {
             <span class="text">${text}</span class="text">
         </header>
         <section>
-            ${card.value <= 10 ? Array(card.value).fill('<span>' + entity + '</span>').join("") : `<span>${letter}</span>`}
+            ${card.value <= 10 ? Array(card.value).fill('<span>' + entity + '</span>').join("") : `<span>${entity}</span><span>${letter}</span>`}
         </section>
         <header>
             <span class="number">${letter}</span>
@@ -230,8 +230,17 @@ function renderSuitSelector() {
     let el = document.createElement('div')
     el.classList.add('modal')
     el.innerHTML = `
-    
+        <div class="modal-contents">
+        <h1> Crazy 8 </h1>
+        <h2> Select the new suit </h2>
+        <button class="selector">&spades;</button>
+        <button class="selector">&clubs;</button>
+        <button class="selector">&diams;</button>
+        <button class="selector">&hearts;</button>
+        <p>The card will take the suit of the one selected above</p>
+        </div>
     `
+    return el;
 }
 
 function renderView(root: Element, casino: Casino) {
@@ -271,7 +280,26 @@ function userSelectCard(resolve) {
 }
 
 function userSelectSuit(resolve) {
-    resolve('H');
+    let el = renderSuitSelector();
+    [...el.querySelectorAll(".selector")].forEach((s, i)=>{
+        s.addEventListener("click", function () {
+            switch (i) {
+                case 0:
+                    resolve('S');
+                    break;
+                case 1:
+                    resolve('C');
+                    break;
+                case 2:
+                    resolve('D');
+                    break;
+                case 3:
+                    resolve('H');
+                    break;
+            }
+        })
+    })
+    root.appendChild(el);
 }
 
 let root = document.querySelector("body");

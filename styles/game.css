@@ -58,7 +58,7 @@ body {
     background-color: rgba(0, 0, 0, 0.719);
     color: #fff;
     width: auto;
-    max-width: 300px;
+    max-width: 500px;
     text-align: center;
     padding: 5px;
     margin: auto;
@@ -314,3 +314,30 @@ a {
     transform: rotate(180deg);
 }
 
+
+.modal {
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    margin: auto auto;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 20px rgba(36, 36, 36, 0.5);
+}
+
+.modal-contents {
+    padding: 20px;
+    min-height: 300px;
+    background: #fff;
+}
+
+.selector {
+    font-size: 5em;
+    margin: 0;
+}
