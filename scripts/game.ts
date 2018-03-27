@@ -221,13 +221,13 @@ class Player {
      * Reaches out to `userSelectCard` function to get an index for a card
      */
     getCardIndexToPlay(): Promise<number> {
-        return new Promise(userSelectCard)
+        return new Promise(resolve => userSelectCard(card => this.game.discardPile.canPlayCard(card), resolve))
     }
 
     /**
      * Reaches out to `userSelectSuit` function to get a new suit
      */
-    pickCrazySuit():Promise<'H' | 'C' | 'S' | 'D'> {
+    pickCrazySuit(): Promise<'H' | 'C' | 'S' | 'D'> {
         return new Promise(userSelectSuit);
     }
 
@@ -258,7 +258,7 @@ class Player {
                     card.suit = await this.pickCrazySuit();
                     console.log("An 8 was played! Changing suit to", card.suit)
                 }
-                
+
                 this.hand.dropCard(cardIndex);
                 this.game.discardPile.putCard(card);
                 console.log(`${this.name} is Playing`, card);
@@ -301,7 +301,7 @@ class BotPlayer extends Player {
     /**
      * Randomly select a new suit
      */
-    pickCrazySuit():Promise<'H' | 'C' | 'S' | 'D'> {
+    pickCrazySuit(): Promise<'H' | 'C' | 'S' | 'D'> {
         return new Promise((resolve) => {
             switch (Math.floor(Math.random() * 4)) {
                 case 0:
@@ -351,7 +351,7 @@ class BotPlayer extends Player {
                 } else {
                     if (card.value == 8) {
                         card.suit = await this.pickCrazySuit();
-                    
+
                         console.log("An 8 was played! Changing suit to", card.suit)
                     }
                     this.hand.dropCard(cardIndex);
@@ -410,14 +410,14 @@ class Casino {
                 await this.game.nextTurn();
                 this.renderHook();
             }
-            this.renderHook();
 
-            let isPlayerWinner = this.game.turn == 0;
+            let isPlayerWinner = this.game.turn == 1;
             if (isPlayerWinner) {
                 this.user.moneyRemaining += this.betAmount;
             } else {
                 this.user.moneyRemaining -= this.betAmount;
             }
+            this.renderHook();
             resolve(isPlayerWinner);
         })
 

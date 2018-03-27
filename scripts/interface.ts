@@ -228,33 +228,100 @@ function renderTable(casino: Casino) {
 
 function renderSuitSelector() {
     let el = document.createElement('div')
-    el.classList.add('modal')
     el.innerHTML = `
-        <div class="modal-contents">
-        <h1> Crazy 8 </h1>
+        <h1> Crazy 8 Played!</h1>
         <h2> Select the new suit </h2>
         <button class="selector">&spades;</button>
         <button class="selector">&clubs;</button>
         <button class="selector">&diams;</button>
         <button class="selector">&hearts;</button>
         <p>The card will take the suit of the one selected above</p>
-        </div>
     `
+    return renderModal(el);
+}
+
+
+function renderEndGameMenu(win:boolean, betAmount:number, playAgain:()=>void, leave:()=>void) {
+    let el = document.createElement('div')
+    el.innerHTML = `
+    <h1>${win ? "Victory!" : "Lost!"}</h1>
+    <h2>You have ${win ? "Won" : "Lost"} ${betAmount}$</h2>
+    <button class="replay">Play Again!</button>
+    <button class="leave">Leave</button>
+    `
+    el.querySelector(".replay").addEventListener("click", playAgain)
+    el.querySelector(".leave").addEventListener("click", leave)
+    return renderModal(el);
+}
+
+function renderThankYouModal(user: User) {
+    let el = document.createElement('div')
+    el.innerHTML = `
+    <h1>Thanks ${user.name} for visiting!</h1>
+    <h2>You have now have ${user.moneyRemaining}$</h2>
+    <a href="./intro.html">Go to intro page</a>
+    `
+    return renderModal(el);
+}
+
+function renderModal(modalContents: Element) {
+
+    let el = document.createElement('div')
+    el.classList.add('modal')
+    modalContents.classList.add('modal-contents')
+    el.appendChild(modalContents);
     return el;
 }
 
-function renderBettingMenu() {
+
+function renderBettingMenu(user: User, submitCb: (amount: number) => void) {
     let el = document.createElement('div')
-    el.classList.add('modal')
     el.innerHTML = `
-        <div class="modal-contents">
         <h1> Crazy 8s </h1>
+        <table>
+        <tr>
+            <th>Name</th>
+            <td>${user.name}</td>
+        </tr>
+        <tr>
+            <th>Username</th>
+            <td>${user.username}</td>
+        </tr>
+        <tr>
+            <th>Phone number</th>
+            <td>${user.phoneNumber}</td>
+        </tr>
+        <tr>
+            <th>Postal code</th>
+            <td>${user.postalCode}</td>
+        </tr>
+        <tr>
+            <th>Money Remaining</th>
+            <td>${user.moneyRemaining}$</td>
+        </tr>
+    </table>
         <h2> Make a bet </h2>
         <input type="number">
-        <p>The card will take the suit of the one selected above</p>
-        </div>
+        <button>Place bet</button>
+        <p>Your bet will either be doubled on a win condition or lost on a loss.</p>
+        <p>The bet has to be less than your total holdings ($${user.moneyRemaining})</p>
+        <p class="error"></p>
     `
-    return el;
+
+    let input = el.querySelector("input");
+    let btn = el.querySelector("button");
+    let error = el.querySelector(".error");
+    btn.addEventListener('click', function () {
+        let isValid = true;
+        if (isNaN(+input.value) || +input.value <= 0 || +input.value > user.moneyRemaining)
+            isValid = false;
+
+        if (!isValid)
+            error.textContent = "Invalid bet.";
+        else
+            submitCb(+input.value);
+    })
+    return renderModal(el);
 }
 
 function renderView(root: Element, casino: Casino) {
@@ -270,12 +337,19 @@ function renderView(root: Element, casino: Casino) {
     root.appendChild(handPlayer);
 }
 
-function userSelectCard(resolve) {
+function revealOpponentCards() {
+    [...root.querySelectorAll("#hand-bot .card")].forEach(card=>{
+        card.classList.remove("back-side")
+        card.classList.add("front-side")
+    })
+}
+
+function userSelectCard(playCheck:(card:Card)=>boolean, resolve) {
     let cards = [...root.querySelectorAll("#hand-player .card")];
     cards.forEach((elCard, index) => {
 
         elCard.addEventListener("click", function () {
-            let playable = casino.game.discardPile.canPlayCard({
+            let playable = playCheck({
                 suit: this.getAttribute("data-suit"),
                 value: +this.getAttribute("data-value")
             })
@@ -295,7 +369,7 @@ function userSelectCard(resolve) {
 
 function userSelectSuit(resolve) {
     let el = renderSuitSelector();
-    [...el.querySelectorAll(".selector")].forEach((s, i)=>{
+    [...el.querySelectorAll(".selector")].forEach((s, i) => {
         s.addEventListener("click", function () {
             switch (i) {
                 case 0:
@@ -314,9 +388,5 @@ function userSelectSuit(resolve) {
         })
     })
     root.appendChild(el);
-}
-
-function displayMenu() {
-
 }
 

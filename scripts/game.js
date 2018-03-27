@@ -181,7 +181,7 @@ class Player {
      * Reaches out to `userSelectCard` function to get an index for a card
      */
     getCardIndexToPlay() {
-        return new Promise(userSelectCard);
+        return new Promise(resolve => userSelectCard(card => this.game.discardPile.canPlayCard(card), resolve));
     }
     /**
      * Reaches out to `userSelectSuit` function to get a new suit
@@ -335,14 +335,14 @@ class Casino {
                 await this.game.nextTurn();
                 this.renderHook();
             }
-            this.renderHook();
-            let isPlayerWinner = this.game.turn == 0;
+            let isPlayerWinner = this.game.turn == 1;
             if (isPlayerWinner) {
                 this.user.moneyRemaining += this.betAmount;
             }
             else {
                 this.user.moneyRemaining -= this.betAmount;
             }
+            this.renderHook();
             resolve(isPlayerWinner);
         });
     }

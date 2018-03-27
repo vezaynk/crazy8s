@@ -113,6 +113,9 @@ elMoney.addEventListener('change', function (e) {
     // Must be between 5 and 5000
     if (value > 5000 || value < 5)
         isValid = false;
+    // Must be whole number
+    if (Math.round(value) != value)
+        isValid = false;
     this.className = "";
     this.parentElement.querySelector(".error").textContent = "";
     if (isValid) {

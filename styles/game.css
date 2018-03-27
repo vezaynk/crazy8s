@@ -287,13 +287,13 @@ body {
     }
 }
 
-a {
+.toolbar a {
     color: white;
 }
 
 #infoBox {
     position: absolute;
-    bottom: 10px;
+    top: 10px;
     left: 10px;
     z-index: 9999;
     color: black;
@@ -341,4 +341,12 @@ a {
 .selector {
     font-size: 5em;
     margin: 0;
+}
+
+.error {
+    color: red;
+}
+
+th {
+    text-align: left;
 }
