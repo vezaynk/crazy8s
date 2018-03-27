@@ -9,6 +9,9 @@ let qArray = location.search
 }, {});
 let monkeyUser = new User(qArray.first + " " + qArray.last, qArray.username, qArray.phone, qArray.postal, +qArray.money);
 (function playGame() {
+    // Ran out of money. Bye bye!
+    if (!monkeyUser.moneyRemaining)
+        return root.appendChild(renderThankYouModal(monkeyUser));
     let casino = new Casino(monkeyUser, true);
     casino.renderHook = function () {
         renderView(root, casino);
