@@ -277,7 +277,8 @@ function renderModal(modalContents: Element) {
 function renderBettingMenu(user: User, submitCb: (amount: number) => void) {
     let el = document.createElement('div')
     el.innerHTML = `
-        <h1> Crazy 8s </h1>
+        <h2>The Happy Gambler Presents...</h2>
+        <h1> Crazy 8s</h1>
         <table>
         <tr>
             <th>Name</th>
@@ -300,6 +301,7 @@ function renderBettingMenu(user: User, submitCb: (amount: number) => void) {
             <td>${user.moneyRemaining}$</td>
         </tr>
     </table>
+    <hr>
         <h2> Make a bet </h2>
         <input type="number">
         <button>Place bet</button>
