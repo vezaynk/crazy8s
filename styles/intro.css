@@ -20,6 +20,8 @@ body {
 }
 
 input {
+    /*Overrides chrome's outline*/
+    outline-width: 0 !important;
     height: 2em;
     margin: 10px;
     border: none;
@@ -55,4 +57,14 @@ input {
     display: block;
     color: red;
     font-size: .7em;
+}
+
+.container {
+    max-width: 100%;
+    padding: 20px;
+    width: 400px;
+}
+
+form {
+    padding: 10px;
 }
