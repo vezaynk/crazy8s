@@ -31,6 +31,7 @@ body {
     box-shadow: 0 0 5px rgba(36, 36, 36, 1);
     align-items: center;
     flex: 2;
+    user-select: none;
 }
 
 .hand .card {
@@ -46,6 +47,7 @@ body {
     flex: 3;
     box-shadow: 0 0 5px rgba(36, 36, 36, 1);
     background-image: url("../images/surface.jpg");
+    user-select: none;
 }
 
 .deck .card:first-child {
