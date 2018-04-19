@@ -1,9 +1,9 @@
-let elFirst = <HTMLInputElement>document.querySelector("#first");
-let elLast = <HTMLInputElement>document.querySelector("#last");
+let elFirst = <HTMLInputElement>document.querySelector("#firstName");
+let elLast = <HTMLInputElement>document.querySelector("#lastName");
 let elUsername = <HTMLInputElement>document.querySelector("#username");
-let elPhone = <HTMLInputElement>document.querySelector("#phone");
-let elPostal = <HTMLInputElement>document.querySelector("#postal");
-let elMoney = <HTMLInputElement>document.querySelector("#money");
+let elPhone = <HTMLInputElement>document.querySelector("#phoneNum");
+let elPostal = <HTMLInputElement>document.querySelector("#pCode");
+let elMoney = <HTMLInputElement>document.querySelector("#bankRoll");
 let elForm = document.querySelector("form");
 
 // Refreshing breaks state
@@ -160,18 +160,30 @@ elForm.addEventListener("submit", function (e) {
             localStorage.setItem(item.key, item.value);
         })
 
-    // Save timestamp
-    localStorage.setItem("timestamp", Date.now().toString());
 })
 
-elFirst.value = localStorage.getItem("first");
-elLast.value = localStorage.getItem("last");
-elUsername.value = localStorage.getItem("username");
-elPhone.value = localStorage.getItem("phone");
-elPostal.value = localStorage.getItem("postal");
-elMoney.value = localStorage.getItem("money");
 
-[...allInputs].forEach(i => i.dispatchEvent(new Event("change")))
+if (location.search != "?change") {
+    elFirst.value = localStorage.getItem("firstName");
+    elLast.value = localStorage.getItem("lastName");
+    elUsername.value = localStorage.getItem("username");
+    elPhone.value = localStorage.getItem("phoneNum");
+    elPostal.value = localStorage.getItem("pCode");
+    elMoney.value = localStorage.getItem("bankRoll");
 
-if (location.search != "?change")
-    elForm.submit();
+    let complete = [...allInputs].every(i => {
+        if (i.value) {
+            i.dispatchEvent(new Event("change"))
+            return true;
+        }
+    })
+    if (complete)
+        document.getElementById("btn").click();
+} else {
+    localStorage.removeItem("firstName");
+    localStorage.removeItem("lastName");
+    localStorage.removeItem("username");
+    localStorage.removeItem("phoneNum");
+    localStorage.removeItem("pCode");
+    localStorage.removeItem("bankRoll");
+}

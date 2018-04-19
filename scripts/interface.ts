@@ -203,8 +203,15 @@ function renderDeck(topCard: Card) {
     let el = document.createElement("section")
     el.classList.add("deck");
 
+    let fancyCard = renderCard(topCard, false);
+
     el.appendChild(renderCard(topCard, false));
-    el.appendChild(renderCard(topCard, true));
+    el.appendChild(fancyCard);
+
+    setTimeout(function () {
+        fancyCard.classList.remove("back-side")
+        fancyCard.classList.add("front-side")
+    }, 300)
 
     return el;
 }
@@ -276,6 +283,18 @@ function renderModal(modalContents: Element) {
 
 function renderBettingMenu(user: User, submitCb: (amount: number) => void) {
     let el = document.createElement('div')
+    let lastVisitDate = new Date(+localStorage.getItem("timestamp"));
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+    let month = months[lastVisitDate.getMonth()];
+    let day = lastVisitDate.getDate();
+    let year = lastVisitDate.getFullYear();
+    let hour = lastVisitDate.getHours();
+    let minute = lastVisitDate.getMinutes();
+
+    // Update last visit
+    // Save timestamp
+    localStorage.setItem("timestamp", Date.now().toString());
     el.innerHTML = `
         <h2>The Happy Gambler Presents...</h2>
         <h1> Crazy 8s</h1>
@@ -300,6 +319,8 @@ function renderBettingMenu(user: User, submitCb: (amount: number) => void) {
             <th>Money Remaining</th>
             <td>${user.moneyRemaining}$</td>
         </tr>
+        <tr><th>Last visit</th><td>${day} of ${month} ${year} at ${hour}:${minute}</td><tr>
+        <tr><th>Not you?</th><td><a href="./intro.html?change">Change details</a></td></tr>
     </table>
     <hr>
         <h2> Make a bet </h2>
@@ -356,8 +377,19 @@ function userSelectCard(playCheck:(card:Card)=>boolean, resolve) {
                 value: +this.getAttribute("data-value")
             })
 
-            if (playable)
-                resolve(index)
+            if (playable) {
+                // Some animation!!
+                this.classList.remove("front-side");
+                this.classList.add("back-side");
+
+                let counter = 2;
+                let translateUp = setInterval(() => {
+                    this.style.transform = "translateY(-" + counter + "px)";
+                    counter = Math.pow(counter,1.1);
+                }, 10)
+                setTimeout(_ => resolve(index), 500)
+                //;
+            }
         })
 
     })

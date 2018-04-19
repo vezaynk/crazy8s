@@ -7,7 +7,7 @@ let qArray = location.search
     a[pair[0]] = pair[1].split("+").join(" ");
     return a;
 }, {});
-let monkeyUser = new User(qArray.first + " " + qArray.last, qArray.username, qArray.phone, qArray.postal, +qArray.money);
+let monkeyUser = new User(qArray.firstName + " " + qArray.lastName, qArray.username, qArray.phoneNum, qArray.pCode, +qArray.bankRoll);
 (function playGame() {
     // Ran out of money. Bye bye!
     if (!monkeyUser.moneyRemaining)
