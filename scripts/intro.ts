@@ -186,4 +186,5 @@ if (location.search != "?change") {
     localStorage.removeItem("phoneNum");
     localStorage.removeItem("pCode");
     localStorage.removeItem("bankRoll");
+    localStorage.removeItem("lastVisit");
 }

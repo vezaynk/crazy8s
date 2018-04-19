@@ -158,5 +158,6 @@ else {
     localStorage.removeItem("phoneNum");
     localStorage.removeItem("pCode");
     localStorage.removeItem("bankRoll");
+    localStorage.removeItem("lastVisit");
 }
 //# sourceMappingURL=intro.js.map

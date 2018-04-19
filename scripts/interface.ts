@@ -283,7 +283,7 @@ function renderModal(modalContents: Element) {
 
 function renderBettingMenu(user: User, submitCb: (amount: number) => void) {
     let el = document.createElement('div')
-    let lastVisitDate = new Date(+localStorage.getItem("timestamp"));
+    let lastVisitDate = new Date(+localStorage.getItem("lastVisit"));
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
     let month = months[lastVisitDate.getMonth()];
@@ -294,7 +294,7 @@ function renderBettingMenu(user: User, submitCb: (amount: number) => void) {
 
     // Update last visit
     // Save timestamp
-    localStorage.setItem("timestamp", Date.now().toString());
+    localStorage.setItem("lastVisit", Date.now().toString());
     el.innerHTML = `
         <h2>The Happy Gambler Presents...</h2>
         <h1> Crazy 8s</h1>
@@ -319,7 +319,7 @@ function renderBettingMenu(user: User, submitCb: (amount: number) => void) {
             <th>Money Remaining</th>
             <td>${user.moneyRemaining}$</td>
         </tr>
-        <tr><th>Last visit</th><td>${day} of ${month} ${year} at ${hour}:${minute}</td><tr>
+        <tr><th>Last visit</th><td>${lastVisitDate.getTime() ? `${day} of ${month} ${year} at ${hour}:${minute}` : "This is your first visit"}</td><tr>
         <tr><th>Not you?</th><td><a href="./intro.html?change">Change details</a></td></tr>
     </table>
     <hr>
