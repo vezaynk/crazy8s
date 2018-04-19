@@ -6,12 +6,7 @@ let elPostal = document.querySelector("#postal");
 let elMoney = document.querySelector("#money");
 let elForm = document.querySelector("form");
 // Refreshing breaks state
-elFirst.value = "";
-elLast.value = "";
-elUsername.value = "";
-elPhone.value = "";
-elPostal.value = "";
-elMoney.value = "";
+let allInputs = document.querySelector("form").querySelectorAll(".field input");
 elFirst.addEventListener('change', function (e) {
     const value = this.value;
     let isValid = true;
@@ -123,7 +118,7 @@ elMoney.addEventListener('change', function (e) {
     }
     else {
         this.classList.add("invalid");
-        this.parentElement.querySelector(".error").textContent = "Postal code must be in the format ANA NAN.";
+        this.parentElement.querySelector(".error").textContent = "Must be between 0 and 5000.";
     }
 });
 elForm.addEventListener("submit", function (e) {
@@ -132,6 +127,23 @@ elForm.addEventListener("submit", function (e) {
     let allInputs = this.querySelectorAll(".field input");
     [...allInputs].forEach(i => i.dispatchEvent(new Event("change")));
     if (validInputs.length != allInputs.length)
-        e.preventDefault();
+        return e.preventDefault();
+    // Save all fields to LocalSotrage
+    [...allInputs]
+        .map(input => ({ key: input.id, value: input.value }))
+        .forEach(item => {
+        localStorage.setItem(item.key, item.value);
+    });
+    // Save timestamp
+    localStorage.setItem("timestamp", Date.now().toString());
 });
+elFirst.value = localStorage.getItem("first");
+elLast.value = localStorage.getItem("last");
+elUsername.value = localStorage.getItem("username");
+elPhone.value = localStorage.getItem("phone");
+elPostal.value = localStorage.getItem("postal");
+elMoney.value = localStorage.getItem("money");
+[...allInputs].forEach(i => i.dispatchEvent(new Event("change")));
+if (location.search != "?change")
+    elForm.submit();
 //# sourceMappingURL=intro.js.map
