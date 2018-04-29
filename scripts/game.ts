@@ -417,6 +417,8 @@ class Casino {
             } else {
                 this.user.moneyRemaining -= this.betAmount;
             }
+            localStorage.setItem("bankRoll", this.user.moneyRemaining.toString());
+
             this.renderHook();
             resolve(isPlayerWinner);
         })

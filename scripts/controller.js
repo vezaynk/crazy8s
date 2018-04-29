@@ -15,6 +15,7 @@ let monkeyUser = new User(qArray.firstName + " " + qArray.lastName, qArray.usern
     let casino = new Casino(monkeyUser, true);
     casino.renderHook = function () {
         renderView(root, casino);
+        window.scrollTo(0, document.body.scrollHeight);
     };
     root.appendChild(renderBettingMenu(monkeyUser, (betAmount) => {
         casino.betAmount = betAmount;

@@ -199,20 +199,23 @@ function renderInfoBox(user: User) {
     return el;
 }
 
+let lastCard = null;
+
 function renderDeck(topCard: Card) {
     let el = document.createElement("section")
     el.classList.add("deck");
 
-    let fancyCard = renderCard(topCard, false);
+    let fancyCard = renderCard(topCard, topCard == lastCard);
 
     el.appendChild(renderCard(topCard, false));
     el.appendChild(fancyCard);
 
-    setTimeout(function () {
-        fancyCard.classList.remove("back-side")
-        fancyCard.classList.add("front-side")
-    }, 300)
+        setTimeout(function () {
+            fancyCard.classList.remove("back-side")
+            fancyCard.classList.add("front-side")
+        }, 300)
 
+    lastCard = topCard;
     return el;
 }
 
@@ -384,10 +387,10 @@ function userSelectCard(playCheck:(card:Card)=>boolean, resolve) {
 
                 let counter = 2;
                 let translateUp = setInterval(() => {
-                    this.style.transform = "translateY(-" + counter + "px)";
+                    this.style.transform = "translateY(" + counter + "px)";
                     counter = Math.pow(counter,1.1);
                 }, 10)
-                setTimeout(_ => resolve(index), 500)
+                setTimeout(_ => resolve(index), 1000)
                 //;
             }
         })
