@@ -1,7 +1,7 @@
 function renderCard(card, faceUp) {
     // Determine primary color
     let color = "black";
-    if (card.suit == 'H' || card.suit == 'D')
+    if (card.suit == "H" || card.suit == "D")
         color = "red";
     // Determine card text
     let text = "";
@@ -54,28 +54,28 @@ function renderCard(card, faceUp) {
     }
     let entity = "";
     switch (card.suit) {
-        case 'H':
+        case "H":
             text += "Hearts";
             entity = "&hearts;";
             break;
-        case 'C':
+        case "C":
             text += "clubs";
             entity = "&clubs;";
             break;
-        case 'D':
+        case "D":
             text += "Diamonds";
             entity = "&diams;";
             break;
-        case 'S':
+        case "S":
             text += "Spades";
             entity = "&spades;";
             break;
     }
-    let el = document.createElement('div');
+    let el = document.createElement("div");
     el.setAttribute("data-suit", card.suit);
     el.setAttribute("data-value", card.value.toString());
-    el.className = `card ${faceUp ? 'front-side' : 'back-side'} ${color}`;
-    let html = (`
+    el.className = `card ${faceUp ? "front-side" : "back-side"} ${color}`;
+    let html = `
     <div class="card--back">
         <section>
         </section>
@@ -102,19 +102,23 @@ function renderCard(card, faceUp) {
             <span class="text">${text}</span class="text">
         </header>
         <section>
-            ${card.value <= 10 ? Array(card.value).fill('<span>' + entity + '</span>').join("") : `<span>${entity}</span><span>${letter}</span>`}
+            ${card.value <= 10
+        ? Array(card.value)
+            .fill("<span>" + entity + "</span>")
+            .join("")
+        : `<span>${entity}</span><span>${letter}</span>`}
         </section>
         <header>
             <span class="number">${letter}</span>
             <span class="text">${text}</span class="text">
         </header>
     </div>
-    `);
+    `;
     el.innerHTML = html;
     return el;
 }
 function renderHand(hand, faceUp) {
-    let elHand = document.createElement('section');
+    let elHand = document.createElement("section");
     elHand.className = "hand";
     hand.cards.forEach(card => elHand.appendChild(renderCard(card, faceUp)));
     return elHand;
@@ -136,12 +140,12 @@ function renderHeader(casino) {
 </div>`;
     let elShowInfoBox = elTopBar.querySelector("#showInfoBox");
     let elInfoBox = renderInfoBox(casino.user);
-    elInfoBox.classList.toggle("hidden");
+    $(elInfoBox).toggle(200, "linear");
     elShowInfoBox.addEventListener("click", function () {
-        elInfoBox.classList.toggle("hidden");
+        $(elInfoBox).toggle(200, "linear");
     });
     elInfoBox.addEventListener("click", function () {
-        elInfoBox.classList.toggle("hidden");
+        $(elInfoBox).toggle(200, "linear");
     });
     elInfo.appendChild(elTopBar);
     elInfo.appendChild(elInfoBox);
@@ -202,7 +206,7 @@ function renderTable(casino) {
     return el;
 }
 function renderSuitSelector() {
-    let el = document.createElement('div');
+    let el = document.createElement("div");
     el.innerHTML = `
         <h1> Crazy 8 Played!</h1>
         <h2> Select the new suit </h2>
@@ -215,7 +219,7 @@ function renderSuitSelector() {
     return renderModal(el);
 }
 function renderEndGameMenu(win, betAmount, playAgain, leave) {
-    let el = document.createElement('div');
+    let el = document.createElement("div");
     el.innerHTML = `
     <h1>${win ? "Victory!" : "Lost!"}</h1>
     <h2>You have ${win ? "Won" : "Lost"} ${betAmount}$</h2>
@@ -227,7 +231,7 @@ function renderEndGameMenu(win, betAmount, playAgain, leave) {
     return renderModal(el);
 }
 function renderThankYouModal(user) {
-    let el = document.createElement('div');
+    let el = document.createElement("div");
     el.innerHTML = `
     <h1>Thanks ${user.name} for visiting!</h1>
     <h2>You have now have ${user.moneyRemaining}$</h2>
@@ -236,16 +240,29 @@ function renderThankYouModal(user) {
     return renderModal(el);
 }
 function renderModal(modalContents) {
-    let el = document.createElement('div');
-    el.classList.add('modal');
-    modalContents.classList.add('modal-contents');
+    let el = document.createElement("div");
+    el.classList.add("modal");
+    modalContents.classList.add("modal-contents");
     el.appendChild(modalContents);
     return el;
 }
 function renderBettingMenu(user, submitCb) {
-    let el = document.createElement('div');
+    let el = document.createElement("div");
     let lastVisitDate = new Date(+localStorage.getItem("lastVisit"));
-    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+    ];
     let month = months[lastVisitDate.getMonth()];
     let day = lastVisitDate.getDate();
     let year = lastVisitDate.getFullYear();
@@ -278,7 +295,9 @@ function renderBettingMenu(user, submitCb) {
             <th>Money Remaining</th>
             <td>${user.moneyRemaining}$</td>
         </tr>
-        <tr><th>Last visit</th><td>${lastVisitDate.getTime() ? `${day} of ${month} ${year} at ${hour}:${minute}` : "This is your first visit"}</td><tr>
+        <tr><th>Last visit</th><td>${lastVisitDate.getTime()
+        ? `${day} of ${month} ${year} at ${hour}:${minute}`
+        : "This is your first visit"}</td><tr>
         <tr><th>Not you?</th><td><a href="./intro.html?change">Change details</a></td></tr>
     </table>
     <hr>
@@ -292,15 +311,20 @@ function renderBettingMenu(user, submitCb) {
     let input = el.querySelector("input");
     let btn = el.querySelector("button");
     let error = el.querySelector(".error");
-    btn.addEventListener('click', function () {
+    btn.addEventListener("click", function () {
         let isValid = true;
-        if (isNaN(+input.value) || +input.value <= 0 || +input.value > user.moneyRemaining)
+        if (isNaN(+input.value) ||
+            +input.value <= 0 ||
+            +input.value > user.moneyRemaining)
             isValid = false;
         if (!isValid)
             error.textContent = "Invalid bet.";
-        else
-            submitCb(+input.value);
+        else {
+            setTimeout(_ => $(el).hide(200, "linear", () => submitCb(+input.value)), 200);
+        }
     });
+    $(el).hide();
+    setTimeout(_ => $(el).show(200, "linear"), 200);
     return renderModal(el);
 }
 function renderView(root, casino) {
@@ -333,7 +357,11 @@ function userSelectCard(playCheck, resolve) {
                 this.classList.add("back-side");
                 let counter = 2;
                 let translateUp = setInterval(() => {
-                    this.style.transform = "translateY(" + counter + "px)";
+                    // this.style.transform = "translateY(" + counter + "px)";
+                    // jquery animation wow
+                    $(this).css({
+                        transform: "translateY(" + counter + "px)"
+                    });
                     counter = Math.pow(counter, 1.1);
                 }, 10);
                 setTimeout(_ => resolve(index), 1000);
@@ -342,7 +370,7 @@ function userSelectCard(playCheck, resolve) {
         });
     });
     let deck = root.querySelector(".deck .card.back-side");
-    deck.addEventListener('click', function () {
+    deck.addEventListener("click", function () {
         resolve(-1);
     });
 }
@@ -350,22 +378,27 @@ function userSelectSuit(resolve) {
     let el = renderSuitSelector();
     [...el.querySelectorAll(".selector")].forEach((s, i) => {
         s.addEventListener("click", function () {
-            switch (i) {
-                case 0:
-                    resolve('S');
-                    break;
-                case 1:
-                    resolve('C');
-                    break;
-                case 2:
-                    resolve('D');
-                    break;
-                case 3:
-                    resolve('H');
-                    break;
-            }
+            $(el).hide(200, "linear", () => {
+                switch (i) {
+                    case 0:
+                        resolve("S");
+                        break;
+                    case 1:
+                        resolve("C");
+                        break;
+                    case 2:
+                        resolve("D");
+                        break;
+                    case 3:
+                        resolve("H");
+                        break;
+                }
+            });
         });
     });
     root.appendChild(el);
+    $(el)
+        .hide()
+        .show(200, "linear");
 }
 //# sourceMappingURL=interface.js.map
