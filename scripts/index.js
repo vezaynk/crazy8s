@@ -24,10 +24,9 @@ $(function () {
                 setTimeout(() => { clearInterval(interval); }, 5000 * 2);
             }, index * 50);
         });
-        // setTimeout(canvasAnimation, $(".cards").length * 50 + 5000 * 2)
+        setTimeout(canvasAnimation, $(".cards").length * 50 + 5000 * 2);
     }
     flipCards();
-    canvasAnimation();
     async function canvasAnimation() {
         $(".card-fancy-container").fadeOut("slow");
         canvas.width = window.innerWidth;
