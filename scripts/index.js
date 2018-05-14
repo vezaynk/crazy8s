@@ -35,7 +35,6 @@ $(function () {
         const partH = canvas.height / 4;
         let squares = [Array(7).fill(''), ['', 'C', 'R', 'A', 'Z', 'Y', ''], ['', '', '8', 's', '', '', ''], Array(7).fill('')];
         let ctx = canvas.getContext("2d");
-        //ctx.fillRect(0, 0, canvas.width, canvas.height);
         let paintSquaresBlack = squares.map((row, rowi) => row.map((cell, celli) => {
             let fill = () => { ctx.fillRect(celli * partW, rowi * partH, partW, partH); };
             if (cell) {
@@ -55,10 +54,14 @@ $(function () {
             setTimeout(() => {
                 ctx.fillStyle = "black";
                 paintCell();
-            }, 300 * (i * paintSquaresBlack[0].length + pci));
+            }, 200 * (i * paintSquaresBlack[0].length + pci));
+            setTimeout(() => {
+                ctx.fillStyle = "black";
+                paintCell();
+            }, 200 * (i * paintSquaresBlack[0].length + pci) + 10000);
         }));
         let paintSquaresWhite = squares.map((row, rowi) => row.map((cell, celli) => {
-            let fill = () => { ctx.fillRect(celli * partW, rowi * partH, partW, partH); };
+            let fill = () => ctx.fillRect(celli * partW, rowi * partH, partW, partH);
             if (cell) {
                 ctx.font = "30px Arial";
                 return () => {
@@ -76,8 +79,9 @@ $(function () {
             setTimeout(() => {
                 ctx.fillStyle = "white";
                 paintCell();
-            }, 300 * (i * paintSquaresWhite[0].length + pci) + 5000);
+            }, 200 * (i * paintSquaresWhite[0].length + pci) + 5000);
         }));
     }
+    setTimeout(() => location.pathname = "/intro.html", 27000);
 });
 //# sourceMappingURL=index.js.map

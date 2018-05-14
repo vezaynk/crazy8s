@@ -1,6 +1,16 @@
 * {
     box-sizing: border-box;
 }
+
+#skip {
+    padding: 20px;
+    color: black;
+    background-color: white;
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    z-index: 99;
+}
 .card {
     --red-card-color: #D64C4C;
     --black-card-color: #36474F;
