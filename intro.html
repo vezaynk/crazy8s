@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Happy Gambler</title>
+    <title>Happy Gambler</title>  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="styles/intro.css">
-    <script src="scripts/intro.js" defer></script>
+
 </head>
 
 <body>
@@ -17,49 +17,55 @@
         <form action="game.html">
             <div class="field">
                 <input type="text" id="firstName" name="firstName">
-                <label for="firstName">
+                <label class="label" for="firstName">
                     <span>First name</span>
                 </label>
                 <span class="error"></span>
             </div>
             <div class="field">
                 <input type="text" name="lastName" id="lastName">
-                <label for="lastName">
+                <label class="label" for="lastName">
                     <span>Last name</span>
                 </label>
                 <span class="error"></span>
             </div>
             <div class="field">
                 <input type="text" name="username" id="username">
-                <label for="username">
+                <label class="label" for="username">
                     <span>Username</span>
                 </label>
                 <span class="error"></span>
             </div>
             <div class="field">
                 <input type="text" name="phoneNum" id="phoneNum">
-                <label for="phoneNum">
+                <label class="label" for="phoneNum">
                     <span>Phone number</span>
                 </label>
                 <span class="error"></span>
             </div>
             <div class="field">
                 <input type="text" name="pCode" id="pCode">
-                <label for="pCode">
+                <label class="label" for="pCode">
                     <span>Postal Code</span>
                 </label>
                 <span class="error"></span>
             </div>
             <div class="field">
-                <input type="text" name="bankRoll" id="bankRoll">
-                <label for="bankRoll">
+                <input aria-invalid="false" readonly value="5" type="number" min="5" max="5000" name="bankRoll" id="bankRoll">
+                <label class="label" for="bankRoll">
                     <span>$</span>
                 </label>
-                <span class="error"></span>
+                <div id="slider"></div>
             </div>
             <input type="submit" id="btn" value="Enter!">
         </form>
     </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/additional-methods.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+        crossorigin="anonymous"></script>
+    <script src="scripts/intro.js" defer></script>
 </body>
 
 </html>

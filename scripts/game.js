@@ -132,7 +132,7 @@ class DiscardPile {
     }
     canPlayCard(card) {
         return this.getLastCard().value == card.value
-            || this.getLastCard().suit == card.suit;
+            || this.getLastCard().suit == card.suit || card.value == 8;
     }
     putCard(card) {
         this.cards.push(card);

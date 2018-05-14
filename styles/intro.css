@@ -10,7 +10,7 @@ body {
     position: relative;
 }
 
-.field label {
+.field .label {
     position: absolute;
     top: 20px;
     left: 10px;
@@ -30,9 +30,9 @@ input {
     width: 100%;
 }
 
-.field input:focus~label,
-.field input.valid~label,
-.field input.invalid~label {
+.field input:focus~.label,
+.field input[aria-invalid="false"]~.label,
+.field input[aria-invalid="true"]~.label {
     transform: translateY(-1.4em);
     color: rgb(66, 66, 66);
     font-size: 0.7em;

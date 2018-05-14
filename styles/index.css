@@ -1,0 +1,212 @@
+* {
+    box-sizing: border-box;
+}
+.card {
+    --red-card-color: #D64C4C;
+    --black-card-color: #36474F;
+    --height: 210px;
+    height: var(--height);
+    width: calc(var(--height) / 1.4);
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    transform: rotateZ(-15deg)
+}
+
+.card.black .card--front {
+    --primary-color: var(--red-card-color);
+    --secondary-color: var(--black-card-color);
+}
+
+.card.red .card--front {
+    --primary-color: var(--black-card-color);
+    --secondary-color: var(--red-card-color);
+}
+
+.card>div {
+    position: absolute;
+    height: calc(100% - 20px);
+    width: calc(100% - 20px);
+    top: 10px;
+    left: 10px;
+    backface-visibility: hidden;
+    transition: linear 5s;
+    border: solid 5px white;
+    border-radius: 10px;
+    box-shadow: 0 0 2px #BDBDBD;
+}
+
+.card--back {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.card--front {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.card.back-side .card--back, .card.front-side .card--front {
+    transform: rotateY(0deg);
+}
+
+.card.back-side .card--front, .card.front-side .card--back {
+    transform: rotateY(180deg);
+}
+
+.card--back>section {
+    height: 50%;
+    display: block;
+    padding: 5px;
+}
+
+.card--back>section:nth-of-type(2n) {
+    background-color: var(--black-card-color);
+}
+
+.card--back>section:nth-of-type(2n+1) {
+    background-color: var(--red-card-color);
+}
+
+.card--back>.overlay {
+    background-color: #fff;
+    position: absolute;
+    left: 20%;
+    top: 30%;
+    height: 40%;
+    width: 60%;
+    border-radius: 50%;
+    transform: rotateZ(45deg);
+    padding: 10px;
+    box-shadow: 0 0 2px rgba(36, 36, 36, 0.178);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.card--back>.overlay>.quadrant {
+    width: 50%;
+    height: 50%;
+    display: inline-block;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.card--back>.overlay>.quadrant:nth-child(1) {
+    border-right: solid 1px rgba(0, 0, 0, 0.096);
+    color: var(--red-card-color);
+}
+
+.card--back>.overlay>.quadrant:nth-child(2) {
+    border-bottom: solid 1px rgba(0, 0, 0, 0.096);
+    color: var(--black-card-color);
+}
+
+.card--back>.overlay>.quadrant:nth-child(3) {
+    border-top: solid 1px rgba(0, 0, 0, 0.096);
+    color: var(--black-card-color);
+}
+
+.card--back>.overlay>.quadrant:nth-child(4) {
+    border-left: solid 1px rgba(0, 0, 0, 0.096);
+    color: var(--red-card-color);
+    ;
+}
+
+.card--back>.overlay>.quadrant>span {
+    transform: rotateZ(-45deg);
+}
+
+.card--front {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: space-between;
+    background-color: #fff;
+}
+
+.card-fancy-container .card--front{
+    display: none;
+}
+
+.card--front header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 5px;
+    background-color: var(--secondary-color);
+    color: #fff;
+    text-transform: uppercase;
+    padding-bottom: 5px;
+}
+
+.card--front header:nth-of-type(2) {
+    transform: rotateZ(180deg);
+    background-color: var(--secondary-color);
+}
+
+.card--front header .number {
+    font-size: 1.3em;
+}
+
+.card--front header .text {
+    font-size: .5em;
+    text-align: right;
+}
+
+.card--front section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+.card--front section span {
+    font-size: 1.75em;
+    color: var(--secondary-color);
+}
+
+
+.card--front section span:last-child:first-child {
+    font-size: 4em;
+}
+
+/* Size modifiers */
+
+@media (max-width: 320px) {
+    .card {
+        --height: var(--small-height);
+    }
+    .card .card--front section span {
+        font-size: 1.6em;
+    }
+    .card .card--front header .number {
+        font-size: 1em;
+    }
+    .card .card--front header .text {
+        font-size: .5em;
+    }
+    .card>div {
+        border: solid 5px white;
+        border-radius: 3px;
+    }
+    .card--front header {
+        padding-bottom: 5px;
+    }
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+.card-fancy-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    background-color: black;
+}

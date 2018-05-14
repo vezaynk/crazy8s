@@ -165,7 +165,7 @@ class DiscardPile {
 
     canPlayCard(card: Card): boolean {
         return this.getLastCard().value == card.value
-            || this.getLastCard().suit == card.suit
+            || this.getLastCard().suit == card.suit || card.value == 8
     }
 
     putCard(card: Card) {
