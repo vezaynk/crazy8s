@@ -104,5 +104,5 @@ casino.executeBet().then(won=>{
     console.log("The player lost and now has $" + monkeyUser.moneyRemaining);
   }
 });
-*/ 
+*/
 //# sourceMappingURL=tests.js.map

@@ -1,8 +1,10 @@
 class Deck {
+    cards = [];
     constructor() {
-        this.cards = [];
         // populates deck
-        this.cards = Array(52).fill(0).map((_, i) => {
+        this.cards = Array(52)
+            .fill(0)
+            .map((_, i) => {
             // Cards will be broken up into 4 suits.
             // nSuit = 0: Clubs
             //       = 1: Hearts
@@ -10,7 +12,7 @@ class Deck {
             //       = 3: Spades
             let nSuit = Math.floor(i / 13);
             // Actual value of the card
-            let value = i % 13 + 1;
+            let value = (i % 13) + 1;
             let newCard = { suit: "S", value };
             switch (nSuit) {
                 case 0:
@@ -44,7 +46,7 @@ class Deck {
      * @returns Returns true if card was added to deck
      */
     addCard(card, allowDuplicate = false) {
-        let cardAlreadyInDeck = this.cards.some(c => {
+        let cardAlreadyInDeck = this.cards.some((c) => {
             return c.suit == card.suit || c.value == card.value;
         });
         if (cardAlreadyInDeck && !allowDuplicate) {
@@ -76,10 +78,11 @@ class Deck {
     }
 }
 class Game {
+    deck = new Deck();
+    discardPile;
+    turn = 1;
+    players = [];
     constructor() {
-        this.deck = new Deck();
-        this.turn = 1;
-        this.players = [];
         this.deck.shuffleDeck(12);
         this.discardPile = new DiscardPile(this);
     }
@@ -92,7 +95,7 @@ class Game {
         return currentPlayer.playTurn();
     }
     isOver() {
-        let winningPlayer = this.players.find(player => {
+        let winningPlayer = this.players.find((player) => {
             if (player.hand.cards.length == 0) {
                 return true;
             }
@@ -110,7 +113,7 @@ class Game {
     rebuildDeck() {
         // Add to deck all cards in the discard pile except last one
         this.deck.cards = this.deck.cards.concat(this.discardPile.cards.filter((c, index, cards) => {
-            return (index + 1 != cards.length);
+            return index + 1 != cards.length;
         }));
         // Reshuffling cards
         this.deck.shuffleDeck();
@@ -118,12 +121,12 @@ class Game {
         this.discardPile.cards = [this.discardPile.getLastCard()];
         // Good to go!
     }
-    reset() {
-    }
+    reset() { }
 }
 class DiscardPile {
+    cards = [];
+    game;
     constructor(game) {
-        this.cards = [];
         this.game = game;
         this.cards.push(game.deck.drawCard());
     }
@@ -131,8 +134,9 @@ class DiscardPile {
         return this.cards[this.cards.length - 1];
     }
     canPlayCard(card) {
-        return this.getLastCard().value == card.value
-            || this.getLastCard().suit == card.suit || card.value == 8;
+        return (this.getLastCard().value == card.value ||
+            this.getLastCard().suit == card.suit ||
+            card.value == 8);
     }
     putCard(card) {
         this.cards.push(card);
@@ -155,9 +159,7 @@ class DiscardPile {
     }
 }
 class Hand {
-    constructor() {
-        this.cards = [];
-    }
+    cards = [];
     addCard(card) {
         this.cards.push(card);
     }
@@ -166,10 +168,12 @@ class Hand {
     }
 }
 class Player {
+    hand;
+    game;
+    name = "unknown";
+    skipTurn = false;
+    isBot = false;
     constructor(game) {
-        this.name = "unknown";
-        this.skipTurn = false;
-        this.isBot = false;
         this.hand = new Hand();
         this.game = game;
         // Populate hand with 8 cards
@@ -181,7 +185,7 @@ class Player {
      * Reaches out to `userSelectCard` function to get an index for a card
      */
     getCardIndexToPlay() {
-        return new Promise(resolve => userSelectCard(card => this.game.discardPile.canPlayCard(card), resolve));
+        return new Promise((resolve) => userSelectCard((card) => this.game.discardPile.canPlayCard(card), resolve));
     }
     /**
      * Reaches out to `userSelectSuit` function to get a new suit
@@ -244,7 +248,7 @@ class Player {
 }
 class BotPlayer extends Player {
     getCardIndexToPlay() {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             let index = this.hand.cards.findIndex((card, index) => this.game.discardPile.canPlayCard(card));
             resolve(index);
         });
@@ -256,16 +260,16 @@ class BotPlayer extends Player {
         return new Promise((resolve) => {
             switch (Math.floor(Math.random() * 4)) {
                 case 0:
-                    resolve('S');
+                    resolve("S");
                     break;
                 case 1:
-                    resolve('C');
+                    resolve("C");
                     break;
                 case 2:
-                    resolve('D');
+                    resolve("D");
                     break;
                 case 3:
-                    resolve('H');
+                    resolve("H");
                     break;
             }
         });
@@ -274,7 +278,7 @@ class BotPlayer extends Player {
      * Bot-executed turn. Delays by 2000 and plays the first card it can.
      */
     runTurn() {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             console.log(`It is ${this.name}'s turn! He has ${this.hand.cards.length} cards remaining.`, [].concat(this.hand.cards));
             // Artificial delay before playing
             setTimeout(async (_) => {
@@ -310,9 +314,13 @@ class BotPlayer extends Player {
     }
 }
 class Casino {
+    onGameEnded;
+    game;
+    user;
+    betAmount = 0;
+    hasHuman;
+    renderHook = function () { };
     constructor(user, hasHuman = true) {
-        this.betAmount = 0;
-        this.renderHook = function () { };
         this.user = user;
         this.hasHuman = hasHuman;
     }
@@ -349,8 +357,19 @@ class Casino {
     }
 }
 class User {
+    name;
+    username;
+    phoneNumber;
+    postalCode;
+    moneyRemaining;
     constructor(name, username, phoneNumber, postalCode, moneyRemaining) {
-        Object.assign(this, { name, username, phoneNumber, postalCode, moneyRemaining });
+        Object.assign(this, {
+            name,
+            username,
+            phoneNumber,
+            postalCode,
+            moneyRemaining,
+        });
     }
 }
 //# sourceMappingURL=game.js.map

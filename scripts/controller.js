@@ -19,7 +19,7 @@ let monkeyUser = new User(qArray.firstName + " " + qArray.lastName, qArray.usern
     };
     root.appendChild(renderBettingMenu(monkeyUser, (betAmount) => {
         casino.betAmount = betAmount;
-        casino.executeBet().then(isWinner => {
+        casino.executeBet().then((isWinner) => {
             revealOpponentCards();
             let modal = renderEndGameMenu(isWinner, betAmount, playGame, function () {
                 casino.renderHook();

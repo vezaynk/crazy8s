@@ -1,110 +1,129 @@
-
-
 $(function () {
+  let canvas = <HTMLCanvasElement>document.getElementById("canvas");
 
-    let canvas = <HTMLCanvasElement>document.getElementById("canvas");
+  for (let index = 0; index < 100; index++) {
+    document
+      .querySelector(".card-fancy-container")
+      .appendChild(renderCard({ suit: "H", value: 1 }, true));
+  }
 
-    for (let index = 0; index < 100; index++) {
-        document.querySelector(".card-fancy-container").appendChild(renderCard({ suit: 'H', value: 1 }, true))
+  function flipCard($card) {
+    if ($card.hasClass("back-side")) {
+      $card.removeClass("back-side").addClass("front-side");
+    } else {
+      $card.removeClass("front-side").addClass("back-side");
     }
+  }
 
-    function flipCard($card) {
-        if ($card.hasClass("back-side")) {
-            $card.removeClass("back-side").addClass("front-side")
+  function flipCardContinously($card) {
+    flipCard($card);
+    return setInterval(function () {
+      flipCard($card);
+    }, 5000);
+  }
+
+  function flipCards() {
+    $(".card").each(function (index) {
+      setTimeout(() => {
+        let interval = flipCardContinously($(this));
+        setTimeout(() => {
+          clearInterval(interval);
+        }, 5000 * 2);
+      }, index * 50);
+    });
+
+    setTimeout(canvasAnimation, $(".cards").length * 50 + 5000 * 2);
+  }
+
+  flipCards();
+
+  async function canvasAnimation() {
+    $(".card-fancy-container").fadeOut("slow");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const partW = canvas.width / 7;
+    const partH = canvas.height / 4;
+
+    let squares = [
+      Array(7).fill(""),
+      ["", "C", "R", "A", "Z", "Y", ""],
+      ["", "", "8", "s", "", "", ""],
+      Array(7).fill(""),
+    ];
+
+    let ctx = canvas.getContext("2d");
+
+    let paintSquaresBlack = squares.map((row, rowi) =>
+      row.map((cell, celli) => {
+        let fill = () => {
+          ctx.fillRect(celli * partW, rowi * partH, partW, partH);
+        };
+        if (cell) {
+          ctx.font = "30px Arial";
+          return () => {
+            fill();
+            ctx.fillStyle = "white";
+            ctx.fillText(
+              cell,
+              celli * partW + partW / 2,
+              rowi * partH + partH / 2,
+              partW
+            );
+            ctx.fillStyle = "black";
+          };
         } else {
-            $card.removeClass("front-side").addClass("back-side")
+          return fill;
         }
-    }
+      })
+    );
 
-    function flipCardContinously($card) {
-        flipCard($card);
-        return setInterval(function () {
-            flipCard($card);
-        }, 5000)
-    }
+    paintSquaresBlack.forEach((row, i) =>
+      row.forEach((paintCell, pci) => {
+        setTimeout(() => {
+          ctx.fillStyle = "black";
+          paintCell();
+        }, 200 * (i * paintSquaresBlack[0].length + pci));
+        setTimeout(() => {
+          ctx.fillStyle = "black";
+          paintCell();
+        }, 200 * (i * paintSquaresBlack[0].length + pci) + 10000);
+      })
+    );
 
-    function flipCards() {
-        $(".card").each(function (index) {
-            setTimeout(() => {
-                let interval = flipCardContinously($(this));
-                setTimeout(() => { clearInterval(interval) }, 5000 * 2);
+    let paintSquaresWhite = squares.map((row, rowi) =>
+      row.map((cell, celli) => {
+        let fill = () =>
+          ctx.fillRect(celli * partW, rowi * partH, partW, partH);
 
-            }, index * 50)
-        })
+        if (cell) {
+          ctx.font = "30px Arial";
+          return () => {
+            fill();
+            ctx.fillStyle = "black";
+            ctx.fillText(
+              cell,
+              celli * partW + partW / 2,
+              rowi * partH + partH / 2,
+              partW
+            );
+            ctx.fillStyle = "white";
+          };
+        } else {
+          return fill;
+        }
+      })
+    );
 
-        setTimeout(canvasAnimation, $(".cards").length * 50 + 5000 * 2)
-    }
+    paintSquaresWhite.forEach((row, i) =>
+      row.forEach((paintCell, pci) => {
+        setTimeout(() => {
+          ctx.fillStyle = "white";
+          paintCell();
+        }, 200 * (i * paintSquaresWhite[0].length + pci) + 5000);
+      })
+    );
+  }
 
-    flipCards();
-
-
-    async function canvasAnimation() {
-        $(".card-fancy-container").fadeOut("slow");
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        const partW = canvas.width / 7;
-        const partH = canvas.height / 4;
-
-        let squares = [Array(7).fill(''), ['', 'C', 'R', 'A', 'Z', 'Y', ''], ['', '', '8', 's', '', '', ''], Array(7).fill('')];
-
-        let ctx = canvas.getContext("2d");
-
-
-        let paintSquaresBlack = squares.map((row, rowi) => row.map((cell, celli) => {
-            let fill = () => { ctx.fillRect(celli * partW, rowi * partH, partW, partH) };
-            if (cell) {
-                ctx.font = "30px Arial";
-                return () => {
-                    fill();
-                    ctx.fillStyle = "white";
-                    ctx.fillText(cell, celli * partW + (partW / 2), rowi * partH + (partH / 2), partW);
-                    ctx.fillStyle = "black";
-                }
-
-            } else {
-                return fill;
-            }
-        }))
-
-
-        paintSquaresBlack.forEach((row, i) => row.forEach((paintCell, pci) => {
-            setTimeout(() => {
-                ctx.fillStyle = "black"; 
-                paintCell()
-            }, 200 * (i * paintSquaresBlack[0].length + pci));
-            setTimeout(() => {
-                ctx.fillStyle = "black"; 
-                paintCell()
-            }, 200 * (i * paintSquaresBlack[0].length + pci) + 10000);
-        }))
-
-        let paintSquaresWhite = squares.map((row, rowi) => row.map((cell, celli) => {
-            let fill = () => ctx.fillRect(celli * partW, rowi * partH, partW, partH);
-
-            if (cell) {
-                ctx.font = "30px Arial";
-                return () => {
-                    fill();
-                    ctx.fillStyle = "black";
-                    ctx.fillText(cell, celli * partW + (partW / 2), rowi * partH + (partH / 2), partW);
-                    ctx.fillStyle = "white";
-                }
-
-            } else {
-                return fill;
-            }
-        }))
-
-
-        paintSquaresWhite.forEach((row, i) => row.forEach((paintCell, pci) => {
-            setTimeout(() => {
-                ctx.fillStyle = "white"; paintCell()
-            }, 200 * (i * paintSquaresWhite[0].length + pci) + 5000);
-        }))
-    }
-
-
-
-    setTimeout(() => location.pathname = "/intro.html", 27000)
-})
+  setTimeout(() => (location.href = "./intro.html"), 27000);
+});

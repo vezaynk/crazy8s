@@ -1,7 +1,9 @@
 $(function () {
     let canvas = document.getElementById("canvas");
     for (let index = 0; index < 100; index++) {
-        document.querySelector(".card-fancy-container").appendChild(renderCard({ suit: 'H', value: 1 }, true));
+        document
+            .querySelector(".card-fancy-container")
+            .appendChild(renderCard({ suit: "H", value: 1 }, true));
     }
     function flipCard($card) {
         if ($card.hasClass("back-side")) {
@@ -21,7 +23,9 @@ $(function () {
         $(".card").each(function (index) {
             setTimeout(() => {
                 let interval = flipCardContinously($(this));
-                setTimeout(() => { clearInterval(interval); }, 5000 * 2);
+                setTimeout(() => {
+                    clearInterval(interval);
+                }, 5000 * 2);
             }, index * 50);
         });
         setTimeout(canvasAnimation, $(".cards").length * 50 + 5000 * 2);
@@ -33,16 +37,23 @@ $(function () {
         canvas.height = window.innerHeight;
         const partW = canvas.width / 7;
         const partH = canvas.height / 4;
-        let squares = [Array(7).fill(''), ['', 'C', 'R', 'A', 'Z', 'Y', ''], ['', '', '8', 's', '', '', ''], Array(7).fill('')];
+        let squares = [
+            Array(7).fill(""),
+            ["", "C", "R", "A", "Z", "Y", ""],
+            ["", "", "8", "s", "", "", ""],
+            Array(7).fill(""),
+        ];
         let ctx = canvas.getContext("2d");
         let paintSquaresBlack = squares.map((row, rowi) => row.map((cell, celli) => {
-            let fill = () => { ctx.fillRect(celli * partW, rowi * partH, partW, partH); };
+            let fill = () => {
+                ctx.fillRect(celli * partW, rowi * partH, partW, partH);
+            };
             if (cell) {
                 ctx.font = "30px Arial";
                 return () => {
                     fill();
                     ctx.fillStyle = "white";
-                    ctx.fillText(cell, celli * partW + (partW / 2), rowi * partH + (partH / 2), partW);
+                    ctx.fillText(cell, celli * partW + partW / 2, rowi * partH + partH / 2, partW);
                     ctx.fillStyle = "black";
                 };
             }
@@ -67,7 +78,7 @@ $(function () {
                 return () => {
                     fill();
                     ctx.fillStyle = "black";
-                    ctx.fillText(cell, celli * partW + (partW / 2), rowi * partH + (partH / 2), partW);
+                    ctx.fillText(cell, celli * partW + partW / 2, rowi * partH + partH / 2, partW);
                     ctx.fillStyle = "white";
                 };
             }
@@ -82,6 +93,6 @@ $(function () {
             }, 200 * (i * paintSquaresWhite[0].length + pci) + 5000);
         }));
     }
-    setTimeout(() => location.pathname = "/intro.html", 27000);
+    setTimeout(() => (location.href = "./intro.html"), 27000);
 });
 //# sourceMappingURL=index.js.map
